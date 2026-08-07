@@ -18,11 +18,15 @@ Design rules this file embodies:
   * Read-only is a real mode, not a debugging aid: it is what you give an agent
     pointed at a repository you do not own.
 
-Honest about its limits: a deny list of regexes over a shell command is a speed
-bump, not a sandbox. ``rm -rf ~`` has a hundred spellings -- a variable, a
-base64 pipe, a Python one-liner -- and this catches the obvious ones. The load-
-bearing boundaries are ``resolve`` in ``tools.py`` and the account this process
-runs as. Read the list as "catch the fat-finger", never as "the tool is now safe".
+Honest about its limits, because this is the file people trust by mistake. A
+deny list of regexes over a shell command is a speed bump, not a sandbox:
+``rm -rf ~`` has a hundred spellings -- a variable, a base64 pipe, a Python
+one-liner -- and this catches the ones people type. More important, ``resolve``
+in ``tools.py`` confines the five *file* tools and nothing else: ``bash`` gets a
+shell, and ``cat ../../etc/passwd`` is not a path the harness ever inspects. So
+``bash`` is the hole, by construction, and the only real boundaries around it
+are the account this process runs as and an OS sandbox this harness does not yet
+build. Read the list as "catch the fat-finger", never as "the tool is safe now".
 """
 
 import re
