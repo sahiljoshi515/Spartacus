@@ -6,8 +6,8 @@ memory and skills go into the system prompt, which was always just a string the
 caller built. Everything new is an argument.
 
 The scenes, each proving one claim:
-  * ``compaction`` -- a task too long for a 1,500-token budget finishes anyway,
-    and you can watch the history collapse mid-run.
+  * ``compaction`` -- a task run against a token budget finishes correctly
+    anyway, and you can watch the history collapse mid-run.
   * ``memory`` -- the agent writes a fact down, then a second conversation that
     starts from an empty message list answers a question about it.
   * ``recall`` -- the same question in a *new process*, with the file tools in
@@ -25,7 +25,7 @@ Design rules this file embodies:
     point of the scene -- the entire behaviour change is text on disk, so it
     belongs somewhere you can read it, not in a fixture you have to go find.
 
-Run from the repo root:  python3 demos/day3_context.py [scene]
+Run from the repo root:  python3 demos/day3_context.py [scene] [budget]
 """
 
 import pathlib
@@ -148,21 +148,34 @@ def run(workdir, task, system, toolset, before_turn=None):
 
 
 def scene_compaction():
-    """A task longer than its budget: watch the history collapse and finish anyway."""
+    """A task longer than its budget: watch the history collapse and finish anyway.
+
+    The budget is the optional second argument. It matters because whether
+    compaction fires at all is a race between a fixed ceiling and how chatty
+    the model happens to be: this task runs to roughly 1,300 tokens on
+    flash-lite, so at the default it sits just under the line and a single
+    retry is what tips it over. Lower the budget to force the cut.
+    """
     workdir = workspace("day3_pings", fresh=True)
+    budget = int(sys.argv[2]) if len(sys.argv) > 2 else BUDGET
 
     def before_turn(messages):
         """The socket day 1 left empty: compact, and say so when it happens."""
         before = context.estimate_tokens(messages)
-        kept = context.compact(provider.DEFAULT_MODEL, messages, BUDGET)
+        kept = context.compact(provider.DEFAULT_MODEL, messages, budget)
         # `is not` and not a length test: compact hands back the very same list
         # when it did nothing, which is how a caller tells a no-op from a cut.
         if kept is not messages:
             print("\n[compact] %d messages / ~%d tokens -> %d messages / ~%d tokens"
                   % (len(messages), before, len(kept), context.estimate_tokens(kept)))
+        else:
+            # Printed every turn, not just on the cut: watching the number climb
+            # toward the budget is most of what makes compaction legible at all.
+            print("[history] %d messages / ~%d of %d tokens"
+                  % (len(messages), before, budget))
         return kept
 
-    print("[budget] %d tokens of history" % BUDGET)
+    print("[budget] %d tokens of history" % budget)
     system, toolset = session(workdir)
     run(workdir, PING_TASK, system, toolset, before_turn=before_turn)
     print("\n[on disk] %s" % sorted(p.name for p in workdir.iterdir()))
@@ -219,7 +232,7 @@ def main():
     """Run one named scene, defaulting to compaction."""
     name = sys.argv[1] if len(sys.argv) > 1 else "compaction"
     if name not in SCENES:
-        sys.exit("usage: day3_context.py [%s]" % "|".join(SCENES))
+        sys.exit("usage: day3_context.py [%s] [budget]" % "|".join(SCENES))
     SCENES[name]()
 
 
