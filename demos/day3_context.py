@@ -134,14 +134,11 @@ def session(workdir):
     return system, {tool.name: tool for tool in toolset}
 
 
-def run(workdir, task, system=None, toolset=None, before_turn=None):
+def run(workdir, task, system, toolset, before_turn=None):
     """Run one conversation from an empty history and return the final text."""
-    built_system, built_tools = session(workdir)
     messages = [{"role": "user", "text": task}]
     print("\n[workdir] %s\n[user] %s" % (workdir, task))
-    answer = loop.run_loop(provider.DEFAULT_MODEL,
-                           built_system if system is None else system, messages,
-                           built_tools if toolset is None else toolset,
+    answer = loop.run_loop(provider.DEFAULT_MODEL, system, messages, toolset,
                            on_event, security.Policy("yolo").check,
                            before_turn=before_turn)
     print("\n[final] %s" % answer)
@@ -164,14 +161,16 @@ def scene_compaction():
         return kept
 
     print("[budget] %d tokens of history" % BUDGET)
-    run(workdir, PING_TASK, before_turn=before_turn)
+    system, toolset = session(workdir)
+    run(workdir, PING_TASK, system, toolset, before_turn=before_turn)
     print("\n[on disk] %s" % sorted(p.name for p in workdir.iterdir()))
 
 
 def scene_memory():
     """Write a fact in one conversation; answer from it in the next."""
     workdir = workspace("day3_project", fresh=True)
-    run(workdir, FACT_TASK)
+    system, toolset = session(workdir)
+    run(workdir, FACT_TASK, system, toolset)
     show(workdir / memory.MEMORY_FILE, memory.MEMORY_FILE)
     print("\n=== a completely fresh conversation over the same directory ===")
     scene_recall()
@@ -184,7 +183,7 @@ def scene_recall():
     print("\n=== system prompt, rebuilt from disk ===\n%s\n===" % system)
     # An empty toolset is the proof. The agent cannot read the memory file, so
     # a correct answer can only have come from the prompt it was born with.
-    run(workdir, QUESTION, system=system, toolset={})
+    run(workdir, QUESTION, system, {})
 
 
 def scene_skills():
@@ -197,7 +196,8 @@ def scene_skills():
             path.write_text(skill)
         print("\n=== %s ===\n[catalogue] %r"
               % (name, skills.catalog_prompt(workdir)))
-        run(workdir, WRITE_TASK)
+        system, toolset = session(workdir)
+        run(workdir, WRITE_TASK, system, toolset)
         show(workdir / "blurb.txt", "blurb.txt")
 
 
