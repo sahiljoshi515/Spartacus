@@ -10,8 +10,8 @@ The scenes, each proving one claim:
     and you can watch the history collapse mid-run.
   * ``memory`` -- the agent writes a fact down, then a second conversation that
     starts from an empty message list answers a question about it.
-  * ``recall`` -- the same question in a *new process*, with no tools at all, so
-    a right answer cannot have come from anywhere but the system prompt.
+  * ``recall`` -- the same question in a *new process*, with the file tools in
+    hand and the tool log empty, so the fact was known and not looked up.
   * ``skills`` -- one writing task, run twice, against two directories that
     differ by a single markdown file. The voice changes; no code does.
 
@@ -50,6 +50,8 @@ PING_TASK = ("Create five files one.txt through five.txt, each with 20 lines of 
 FACT_TASK = ("Remember for future sessions: this project deploys to fly.io in "
              "the iad region, and we never deploy on a Friday.")
 QUESTION = "Where does this project deploy, in which region, and when must we not?"
+ASK_EXTRA = ("This turn is a question, not a task. Answer it directly from what "
+             "you already know, in one sentence, and do not call any tool.")
 WRITE_TASK = ("Write blurb.txt: three sentences announcing that our CLI now "
               "works offline.")
 
@@ -135,14 +137,14 @@ def session(workdir):
 
 
 def run(workdir, task, system, toolset, before_turn=None):
-    """Run one conversation from an empty history and return the final text."""
+    """Run one conversation from an empty history and return the transcript."""
     messages = [{"role": "user", "text": task}]
     print("\n[workdir] %s\n[user] %s" % (workdir, task))
     answer = loop.run_loop(provider.DEFAULT_MODEL, system, messages, toolset,
                            on_event, security.Policy("yolo").check,
                            before_turn=before_turn)
     print("\n[final] %s" % answer)
-    return answer
+    return messages  # the live list the loop appended to: what actually happened
 
 
 def scene_compaction():
@@ -177,13 +179,21 @@ def scene_memory():
 
 
 def scene_recall():
-    """Ask about the remembered fact with no history and, deliberately, no tools."""
+    """Ask about the remembered fact with no history, and show nothing was read."""
     workdir = workspace("day3_project")
-    system = memory.build_system_prompt(workdir)
+    system = memory.build_system_prompt(workdir, ASK_EXTRA)
+    _, toolset = session(workdir)
     print("\n=== system prompt, rebuilt from disk ===\n%s\n===" % system)
-    # An empty toolset is the proof. The agent cannot read the memory file, so
-    # a correct answer can only have come from the prompt it was born with.
-    run(workdir, QUESTION, system, {})
+    # The proof is an empty tool *log*, not an empty toolset. The agent is handed
+    # read_file and does not reach for it, which is the stronger claim -- and
+    # withholding tools is not even available as a shortcut here: Gemini answers
+    # a tool-shaped prompt with zero declarations by emitting a malformed
+    # function call and no text, so the agent would say nothing at all.
+    transcript = run(workdir, QUESTION, system, toolset)
+    used = [call["name"] for message in transcript
+            for call in message.get("tool_calls") or []]
+    print("\n[tools used] %s -- the answer came from the prompt, not the disk"
+          % (", ".join(used) or "none"))
 
 
 def scene_skills():
