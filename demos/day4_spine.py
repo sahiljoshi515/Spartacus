@@ -44,7 +44,8 @@ import sys
 # before importing it. ``python3 -m spartacus`` needs no such help.
 sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent.parent))
 
-from spartacus import Harness, session  # noqa: E402  (must follow the path fix)
+from spartacus import Harness  # noqa: E402  (must follow the path fix)
+from spartacus.session import INTERRUPTED, SESSION_DIR  # noqa: E402
 
 SCRATCH = pathlib.Path(__file__).resolve().parent.parent / "scratch"
 CLIP = 400  # characters of a tool result worth putting on screen
@@ -88,7 +89,7 @@ def workspace(name, fresh=False):
 
 def logs(workdir):
     """Return the session log filenames in ``workdir``, sorted."""
-    base = workdir / session.SESSION_DIR
+    base = workdir / SESSION_DIR
     return sorted(p.name for p in base.iterdir()) if base.is_dir() else []
 
 
@@ -130,7 +131,7 @@ def scene_resume():
           % (workdir, resumed, len(agent.messages),
              os.path.basename(agent.session_path or "")))
     for message in agent.messages:
-        if message.get("text") == session.INTERRUPTED:
+        if message.get("text") == INTERRUPTED:
             print("[repair] %s: %s" % (message["name"], message["text"]))
     print("\n[final] %s" % agent.run("continue the task"))
     print("\n[sessions] %s\n[on disk] %s"

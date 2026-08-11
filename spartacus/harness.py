@@ -40,9 +40,19 @@ class Harness:
                  system_extra="", on_event=None, budget_tokens=600_000,
                  max_turns=120, session_path=None, enable_subagents=True,
                  persist=True, _depth=0):
-        self.workdir = os.path.realpath(workdir)
+        # expanduser before realpath: realpath does not expand "~", and the
+        # makedirs below is unconditional, so "~/code" would otherwise create a
+        # directory literally named "~" and work in it. A typo'd workdir must
+        # not silently become a real, empty, wrong one.
+        self.workdir = os.path.realpath(os.path.expanduser(workdir))
         os.makedirs(self.workdir, exist_ok=True)
         self.model = model or _env_model() or provider.DEFAULT_MODEL
+        # Deliberately "yolo", inverting security.py's own "safe" default, and
+        # worth saying out loud: an unattended Harness has unrestricted
+        # write_file, edit_file and bash in this directory, behind nothing but
+        # six deny regexes that security.py itself calls a speed bump. The
+        # default suits a harness driven by a script with nobody to ask; pass
+        # security.Policy() to get the asking kind back.
         self.policy = policy or security.Policy("yolo")
         self.on_event = on_event or _silent
         self.budget_tokens = budget_tokens
