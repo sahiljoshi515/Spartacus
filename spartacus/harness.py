@@ -62,12 +62,16 @@ class Harness:
         if path is None:
             return False
         self.session_path = path
-        self.messages = session.load(path)
-        # What came off disk is already on disk. What ``repair`` invented is
-        # not, and has to be written, or the hole it patches reopens on the
-        # next load -- and by then it is buried mid-transcript, where the
-        # tail-only repair will never reach it again.
-        self._recorded = len(self.messages) - _invented(self.messages)
+        # Read and repair in two steps, rather than calling session.load, so the
+        # count of what is already on disk is exact. What ``repair`` invents has
+        # to be written too, or the hole it patches reopens on the next load --
+        # and by then it is buried mid-transcript, where the tail-only repair
+        # will never reach it again. Guessing which messages were invented (by
+        # matching their text) instead re-writes them on every resume, which
+        # answers two tool calls four times and earns the 400 this prevents.
+        self.messages = session.read(path)
+        self._recorded = len(self.messages)
+        self.messages = session.repair(self.messages)
         self._record()
         return bool(self.messages)
 
@@ -149,16 +153,6 @@ def _env_model():
         if os.environ.get(name):
             return os.environ[name]
     return None
-
-
-def _invented(messages):
-    """Count the interruption notices ``session.repair`` appended on load."""
-    count = 0
-    for message in reversed(messages):
-        if message["role"] != "tool" or message.get("text") != session.INTERRUPTED:
-            break
-        count += 1
-    return count
 
 
 def _silent(kind, payload):

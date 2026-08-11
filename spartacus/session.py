@@ -9,7 +9,9 @@ format survives being killed mid-write, which is the part people skip.
 Design rules this file embodies:
   * Append-only, one JSON object per line. A file rewritten in place can be
     corrupted anywhere; a file only ever appended to can be corrupted in exactly
-    one place, the end, and that is a place you can reason about.
+    one place, the end, and that is a place you can reason about. The single
+    exception proves the rule: a write discards a torn final line first, which
+    is the only way the guarantee survives contact with a second crash.
   * A torn tail is expected, not exceptional. ``kill -9`` lands mid-``write``
     eventually, and the honest answer is to keep every line that parsed and
     stop at the one that did not -- not to raise, and never to guess at what
@@ -46,14 +48,15 @@ def new_session(workdir, label="session"):
 
 def append(path, message):
     """Append one message to the log as a single JSON line."""
+    _drop_torn_line(path)
     with open(path, "a", encoding="utf-8") as handle:
         # ensure_ascii=False keeps the log readable: a transcript full of
         # — escapes is a transcript nobody debugs by eye.
         handle.write(json.dumps(message, ensure_ascii=False) + "\n")
 
 
-def load(path):
-    """Return the messages in ``path``, stopping at a torn line and repaired."""
+def read(path):
+    """Return the messages already written to ``path``, stopping at a torn line."""
     messages = []
     with open(path, encoding="utf-8", errors="replace") as handle:
         for line in handle:
@@ -61,7 +64,12 @@ def load(path):
                 messages.append(json.loads(line))
             except ValueError:
                 break  # a half-written final line: everything before it is good
-    return repair(messages)
+    return messages
+
+
+def load(path):
+    """Return the messages in ``path``, stopping at a torn line and repaired."""
+    return repair(read(path))
 
 
 def latest(workdir):
@@ -86,6 +94,32 @@ def repair(messages):
     for call in calls[answered:]:
         messages.append({"role": "tool", "name": call["name"], "text": INTERRUPTED})
     return messages
+
+
+def _drop_torn_line(path):
+    """Remove a half-written final line, so the next append is not welded to it.
+
+    ``kill -9`` mid-``write`` leaves a line with no newline. Appending straight
+    onto it fuses the new message to the fragment, and because ``read`` keeps
+    only what precedes the first unparseable line, everything written from then
+    on is silently unreachable -- the log grows and the transcript does not.
+    Cutting the fragment loses nothing, since it was already past the point
+    where reading stops, and it restores the property the rest of this file
+    relies on: corruption lives at the end, and only until the next write.
+    """
+    if not os.path.exists(path):
+        return
+    with open(path, "rb+") as handle:
+        handle.seek(0, os.SEEK_END)
+        size = handle.tell()
+        if size == 0:
+            return
+        handle.seek(size - 1)
+        if handle.read(1) == b"\n":
+            return  # the common path, and O(1): the log ends on a line boundary
+        handle.seek(0)
+        # At most once per file: after this, every line ends in a newline again.
+        handle.truncate(handle.read().rfind(b"\n") + 1)
 
 
 def _last_assistant(messages):
