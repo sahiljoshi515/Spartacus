@@ -37,9 +37,10 @@ INTERRUPTED = "Interrupted before this ran (process restarted)."
 
 
 def new_session(workdir, label="session"):
-    """Create the session directory and return a fresh timestamped log path."""
+    """Create the session directory, keep it out of git, and return a log path."""
     base = os.path.join(os.path.realpath(workdir), SESSION_DIR)
     os.makedirs(base, exist_ok=True)
+    _self_ignore(os.path.dirname(base))
     # The timestamp leads so the directory sorts chronologically in any listing;
     # the slug follows so a human can tell the runs apart without opening them.
     name = "%d-%s.jsonl" % (int(time.time()), _slugify(label))
@@ -94,6 +95,25 @@ def repair(messages):
     for call in calls[answered:]:
         messages.append({"role": "tool", "name": call["name"], "text": INTERRUPTED})
     return messages
+
+
+def _self_ignore(directory):
+    """Write a ``.gitignore`` covering ``directory`` whole, unless one is there.
+
+    The session log lives inside the working directory, and the working
+    directory is very often a repository the agent was pointed at. Without
+    this, the human's next ``git add -A`` stages their own transcripts -- and a
+    transcript quotes every file the agent read, which is a far wider blast
+    radius than "some logs". The self-ignoring ``*`` is the ordinary idiom for
+    a tool-owned directory, and it is the half of this problem this file can
+    solve on its own: keeping the logs out of the agent's own ``grep`` needs
+    ``IGNORED_DIRS`` in ``tools.py``.
+    """
+    path = os.path.join(directory, ".gitignore")
+    if os.path.exists(path):
+        return  # never clobber: past this point the file belongs to the human
+    with open(path, "w", encoding="utf-8") as handle:
+        handle.write("# Written by spartacus. Session logs are not source.\n*\n")
 
 
 def _drop_torn_line(path):
