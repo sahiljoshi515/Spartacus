@@ -61,7 +61,6 @@ class Harness:
         path = path or session.latest(self.workdir)
         if path is None:
             return False
-        self.session_path = path
         # Read and repair in two steps, rather than calling session.load, so the
         # count of what is already on disk is exact. What ``repair`` invents has
         # to be written too, or the hole it patches reopens on the next load --
@@ -70,6 +69,10 @@ class Harness:
         # matching their text) instead re-writes them on every resume, which
         # answers two tool calls four times and earns the 400 this prevents.
         self.messages = session.read(path)
+        # Adopt the path only once it has actually been read, so a failed read
+        # leaves the harness where it was instead of aimed at a file it cannot
+        # open -- where the next run() would quietly append to it.
+        self.session_path = path
         self._recorded = len(self.messages)
         self.messages = session.repair(self.messages)
         self._record()
@@ -85,7 +88,7 @@ class Harness:
                                self._event, self.policy.check,
                                max_turns=self.max_turns,
                                before_turn=self._before_turn)
-        self._record()  # the turn-limit path appends after its last event
+        self._record()  # a belt-and-braces flush: every append is already evented
         return answer
 
     def _build_tools(self, extra_tools, enable_subagents):
@@ -126,7 +129,14 @@ class Harness:
 
     def _before_turn(self, messages):
         """Hold the history inside the budget; the loop uses what comes back."""
-        return context.compact(self.model, messages, self.budget_tokens)
+        compacted = context.compact(self.model, messages, self.budget_tokens)
+        # Rewind the write cursor here, and only here, because this is the one
+        # instant when the live list is exactly what has been written: the loop
+        # has not appended this turn's reply yet. Clamping later -- inside
+        # _record, once the reply has landed -- would clamp to a length that
+        # already counts it, and that message would never be written at all.
+        self._recorded = min(self._recorded, len(compacted))
+        return compacted
 
     def _event(self, kind, payload):
         """Persist whatever the loop just appended, then tell the caller."""
@@ -137,11 +147,10 @@ class Harness:
         """Append every message added since the last call to the session log."""
         if not self.persist or self.session_path is None:
             return
-        # Compaction replaces the head of the list with a summary, so the live
-        # list can be shorter than what has already been written. Clamp instead
-        # of slicing past the end: the log keeps everything that ever happened,
-        # which is the point of having one. It is the record, not the window.
-        self._recorded = min(self._recorded, len(self.messages))
+        # No clamping here: _before_turn owns the cursor whenever the list
+        # shrinks. The log keeps everything that ever happened, including the
+        # history compaction folded into a summary -- it is the record, not the
+        # window the model sees, and those are allowed to disagree.
         for message in self.messages[self._recorded:]:
             session.append(self.session_path, message)
         self._recorded = len(self.messages)
