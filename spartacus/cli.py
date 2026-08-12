@@ -45,7 +45,7 @@ keys: %(providers)s  from %(config)s
 
 HELP = """  /model            show the current model
   /model <name>     switch model; accepts an alias (%s)
-  /models [vendor]  list what the vendor actually offers, live
+  /models [vendor] [filter]   list what a vendor offers, live
   /mode <name>      switch permission mode (%s)
   /help             this list
   /exit             leave spartacus (so does Ctrl-D, or a bare "exit")
@@ -167,6 +167,36 @@ def interactive(agent):
             print("\n[error] %s: %s" % (type(error).__name__, error))
 
 
+def show_models(vendor=None, match=None):
+    """List models for one vendor, or a count per vendor when none is named.
+
+    A bare ``/models`` used to print all 188 ids a three-vendor setup offers,
+    comma-joined, which is not a list -- it is a wall. Naming a vendor is the
+    common case, so unnamed prints the shape and tells you how to narrow it.
+    """
+    ready = models.configured()
+    if not ready:
+        print("  no API keys found -- see %s" % config.CONFIG_PATH)
+        return
+    if vendor and vendor not in models.PROVIDERS:
+        print("  unknown vendor %r; try %s" % (vendor, ", ".join(ready)))
+        return
+    for name in [vendor] if vendor else ready:
+        try:
+            found = provider.list_models(name)
+        except Exception as error:  # one dead vendor must not hide the others
+            print("  %-10s %s" % (name, error))
+            continue
+        if match:
+            found = [m for m in found if match.lower() in m.lower()]
+        if not vendor:
+            print("  %-10s %d models  (/models %s to list)" % (name, len(found), name))
+            continue
+        print("  %s (%d%s)" % (name, len(found), " matching %r" % match if match else ""))
+        for model in found:
+            print("    %s" % model)
+
+
 def command(agent, line):
     """Handle a ``/`` command. Returns True when the loop should stop."""
     name, _, rest = line[1:].partition(" ")
@@ -186,11 +216,7 @@ def command(agent, line):
         agent.model = model
         print("  model is now %s (%s)" % (model, vendor))
     elif name == "models":
-        for vendor in ([rest] if rest else models.configured()) or ["gemini"]:
-            try:
-                print("  %s: %s" % (vendor, ", ".join(provider.list_models(vendor))))
-            except Exception as error:
-                print("  %s: %s" % (vendor, error))
+        show_models(*rest.split(None, 1) if rest else ())
     elif name == "mode" and rest in security.MODES:
         agent.policy = security.Policy(rest, approver=ask)
         print("  mode is now %s" % rest)
