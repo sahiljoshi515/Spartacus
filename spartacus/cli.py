@@ -41,15 +41,19 @@ RESET = "\033[0m" if _TTY else ""
 BANNER = """%(bold)sspartacus%(reset)s  model %(model)s  mode %(mode)s
 working in %(workdir)s -- the file tools cannot reach outside it
 keys: %(providers)s  from %(config)s
-/help for commands, Ctrl-D to exit, Ctrl-C to abandon a running task."""
+/help for commands, /exit or Ctrl-D to leave, Ctrl-C to abandon a running task."""
 
 HELP = """  /model            show the current model
   /model <name>     switch model; accepts an alias (%s)
   /models [vendor]  list what the vendor actually offers, live
   /mode <name>      switch permission mode (%s)
   /help             this list
+  /exit             leave spartacus (so does Ctrl-D, or a bare "exit")
 Anything else is a task for the agent.""" % (", ".join(sorted(models.ALIASES)),
                                              ", ".join(security.MODES))
+
+# Typed at the prompt on their own, these mean goodbye rather than "do this".
+FAREWELLS = ("exit", "quit", ":q")
 
 
 def build_parser():
@@ -143,8 +147,13 @@ def interactive(agent):
             continue
         if not task:
             continue
+        # A lone "exit" is a goodbye, not a task. Sending it to the model costs
+        # an API call to be told it does not know what you meant.
+        if task.lower() in FAREWELLS:
+            return 0
         if task.startswith("/"):
-            command(agent, task)
+            if command(agent, task):
+                return 0
             continue
         try:
             agent.run(task)
@@ -159,9 +168,11 @@ def interactive(agent):
 
 
 def command(agent, line):
-    """Handle a ``/`` command in the prompt loop. Unknown ones print the help."""
+    """Handle a ``/`` command. Returns True when the loop should stop."""
     name, _, rest = line[1:].partition(" ")
     rest = rest.strip()
+    if name in FAREWELLS:
+        return True
     if name == "model" and not rest:
         print("  %s" % agent.model)
     elif name == "model":
