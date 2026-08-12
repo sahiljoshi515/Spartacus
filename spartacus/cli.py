@@ -27,7 +27,7 @@ import argparse
 import os
 import sys
 
-from . import security
+from . import config, models, provider, security
 from .harness import Harness
 
 CLIP = 90  # characters of an argument line or result line worth showing
@@ -40,7 +40,16 @@ RESET = "\033[0m" if _TTY else ""
 
 BANNER = """%(bold)sspartacus%(reset)s  model %(model)s  mode %(mode)s
 working in %(workdir)s -- the file tools cannot reach outside it
-Ctrl-D to exit, Ctrl-C to abandon a running task."""
+keys: %(providers)s  from %(config)s
+/help for commands, Ctrl-D to exit, Ctrl-C to abandon a running task."""
+
+HELP = """  /model            show the current model
+  /model <name>     switch model; accepts an alias (%s)
+  /models [vendor]  list what the vendor actually offers, live
+  /mode <name>      switch permission mode (%s)
+  /help             this list
+Anything else is a task for the agent.""" % (", ".join(sorted(models.ALIASES)),
+                                             ", ".join(security.MODES))
 
 
 def build_parser():
@@ -59,16 +68,29 @@ def build_parser():
                         help="continue the newest session in the working directory")
     parser.add_argument("--max-turns", type=int, default=120,
                         help="model turns before the agent is told to wrap up")
+    parser.add_argument("--list-models", action="store_true",
+                        help="list the models each configured vendor offers, then exit")
     return parser
 
 
 def main(argv=None):
     """Parse arguments, build the harness, and run headless or interactively."""
     args = build_parser().parse_args(argv)
+    config.load()  # keys from ~/.config/spartacus/env, without beating real env vars
+    if args.list_models:
+        return list_models()
     # Nobody is watching a -p run, and security.refuse means an unattended
     # "safe" would block every write and call it a day.
     mode = args.mode or ("yolo" if args.prompt else "safe")
-    agent = Harness(args.workdir, model=args.model,
+    # Resolve the alias here rather than deep in the provider, so the banner and
+    # the session log both record the id that actually answered.
+    try:
+        model = models.resolve(args.model)[0] if args.model else None
+    except ValueError as error:
+        # Fail here, with the list, rather than as a puzzling 404 five turns in.
+        print("spartacus: %s" % error, file=sys.stderr)
+        return 2
+    agent = Harness(args.workdir, model=model,
                     policy=security.Policy(mode, approver=ask),
                     on_event=show_event, max_turns=args.max_turns)
     if args.resume:
@@ -80,13 +102,36 @@ def main(argv=None):
     if args.prompt:
         agent.run(args.prompt)
         return 0
-    return interactive(agent, mode)
+    return interactive(agent)
 
 
-def interactive(agent, mode):
+def list_models():
+    """Print what every configured vendor offers. Returns a shell exit code."""
+    ready = models.configured()
+    if not ready:
+        print("No API keys found. Put them in %s, one KEY=value per line:"
+              % config.CONFIG_PATH)
+        for name, spec in sorted(models.PROVIDERS.items()):
+            print("  %-10s %s" % (name, spec["keys"][0]))
+        return 1
+    for name in ready:
+        try:
+            found = provider.list_models(name)
+        except Exception as error:  # one dead vendor must not hide the others
+            print("\n%s: %s" % (name, error))
+            continue
+        print("\n%s (%d)" % (name, len(found)))
+        for model in found:
+            print("  %s" % model)
+    return 0
+
+
+def interactive(agent):
     """Run the prompt loop until Ctrl-D. Always returns 0: quitting is not failure."""
     print(BANNER % {"bold": BOLD, "reset": RESET, "model": agent.model,
-                    "mode": mode, "workdir": agent.workdir})
+                    "mode": agent.policy.mode, "workdir": agent.workdir,
+                    "providers": ", ".join(models.configured()) or "none found",
+                    "config": config.describe()})
     while True:
         try:
             task = input("\n%sspartacus>%s " % (BOLD, RESET)).strip()
@@ -98,6 +143,9 @@ def interactive(agent, mode):
             continue
         if not task:
             continue
+        if task.startswith("/"):
+            command(agent, task)
+            continue
         try:
             agent.run(task)
         except KeyboardInterrupt:
@@ -108,6 +156,38 @@ def interactive(agent, mode):
             # was holding. Report and keep the prompt, exactly as the loop
             # turns a broken tool into text instead of a traceback.
             print("\n[error] %s: %s" % (type(error).__name__, error))
+
+
+def command(agent, line):
+    """Handle a ``/`` command in the prompt loop. Unknown ones print the help."""
+    name, _, rest = line[1:].partition(" ")
+    rest = rest.strip()
+    if name == "model" and not rest:
+        print("  %s" % agent.model)
+    elif name == "model":
+        try:
+            model, vendor = models.resolve(rest)
+        except ValueError as error:
+            print("  %s" % error)
+            return
+        # Swapping mid-session is safe because the transcript is neutral: the
+        # translators rebuild each vendor's shape from it on every single call.
+        agent.model = model
+        print("  model is now %s (%s)" % (model, vendor))
+    elif name == "models":
+        for vendor in ([rest] if rest else models.configured()) or ["gemini"]:
+            try:
+                print("  %s: %s" % (vendor, ", ".join(provider.list_models(vendor))))
+            except Exception as error:
+                print("  %s: %s" % (vendor, error))
+    elif name == "mode" and rest in security.MODES:
+        agent.policy = security.Policy(rest, approver=ask)
+        print("  mode is now %s" % rest)
+    elif name == "mode":
+        print("  mode is %s (choose from %s)"
+              % (agent.policy.mode, ", ".join(security.MODES)))
+    else:
+        print(HELP)
 
 
 def show_event(kind, payload):

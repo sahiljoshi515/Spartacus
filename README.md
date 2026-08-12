@@ -1,9 +1,9 @@
 # spartacus
 
-The smallest coding agent that is still a real one. Ten modules do the work, a
-CLI and a fleet runner sit on top, and there are **zero dependencies** — no
-framework, no SDK, not even `requests`. It talks to Gemini over `urllib` from
-the standard library.
+The smallest coding agent that is still a real one. A dozen small modules, a
+CLI and a fleet runner, three model vendors, and **zero dependencies** — no
+framework, no SDK, not even `requests`. It talks to Gemini, OpenAI and Anthropic over
+`urllib` from the standard library.
 
 It is built to be read. Every file fits on a screen or two, every file explains
 why it is shaped the way it is, and the whole thing was written one day at a
@@ -19,14 +19,76 @@ Done — index.html has grid movement on requestAnimationFrame, a score,
 pause on space, and a high score in localStorage.
 ```
 
-## Running it
+## Installing
 
-One environment variable, and nothing else to install:
+Nothing to build and nothing to download. Either put a launcher on your PATH:
 
 ```sh
-export SPARTACUS_API_KEY=...        # or GEMINI_API_KEY
-export SPARTACUS_MODEL=...          # optional; overrides the built-in default
+cat > ~/.local/bin/spartacus <<'EOF'
+#!/bin/sh
+SPARTACUS_HOME="${SPARTACUS_HOME:-$HOME/code/spartacus}"
+exec python3 -c "import sys; sys.path.insert(0, '$SPARTACUS_HOME'); \
+from spartacus.cli import main; sys.exit(main(sys.argv[1:]))" "$@"
+EOF
+chmod +x ~/.local/bin/spartacus
 ```
+
+…or install it properly, which gives you the same `spartacus` command:
+
+```sh
+pipx install .        # or: python3 -m pip install --user -e .
+```
+
+The launcher runs your working tree, so edits take effect with no reinstall.
+Without either, `python3 -m spartacus` always works from the repo root.
+
+## Keys
+
+Put them in one file, outside any repository:
+
+```sh
+mkdir -p ~/.config/spartacus
+cat > ~/.config/spartacus/env <<'EOF'
+GEMINI_API_KEY=...
+OPENAI_API_KEY=...
+ANTHROPIC_API_KEY=...
+EOF
+chmod 600 ~/.config/spartacus/env
+```
+
+One `KEY=value` per line, `#` for comments, `export` optional. The file is read
+lazily — the first time a key is actually needed, never at import — and **real
+environment variables always win**, so exporting one to test something behaves
+the way you expect. `spartacus --list-models` tells you which vendors it found.
+
+| Vendor | Variable |
+|---|---|
+| Gemini | `SPARTACUS_API_KEY`, else `GEMINI_API_KEY` |
+| OpenAI | `OPENAI_API_KEY` |
+| Anthropic | `ANTHROPIC_API_KEY` |
+
+## Choosing a model
+
+Routing is by prefix, so any current model id just works: `gemini-*` and
+`gemma-*` go to Google, `gpt-*`/`o1`/`o3`/`o4` to OpenAI, `claude-*` to
+Anthropic. Short aliases cover the common ones — `flash`, `pro`, `opus`,
+`sonnet`, `haiku` — and `vendor:model` forces the route for anything the
+prefixes don't know yet:
+
+```sh
+spartacus -m sonnet -d ./project              # alias
+spartacus -m gpt-4o -d ./project              # full id
+spartacus -m openai:whatever-ships-next       # explicit route
+spartacus --list-models                       # live, per configured vendor
+export SPARTACUS_MODEL=claude-opus-5          # a default for every run
+```
+
+Inside the prompt loop, `/model <name>` switches vendors mid-conversation —
+the transcript is provider-neutral, so the translators rebuild each vendor's
+wire shape from it on every call. `/models` lists live, `/mode` changes
+permissions, `/help` prints the lot.
+
+## Running it
 
 Three ways in:
 
@@ -56,7 +118,7 @@ at the top of `security.py`.
 
 | Day | File | What it adds | The idea |
 |---|---|---|---|
-| 1 | `provider.py` | Gemini wire format, retries | One translation boundary; nothing else opens a socket |
+| 1 | `provider.py` | Gemini, OpenAI and Anthropic wire formats, retries | One translation boundary; nothing else opens a socket |
 | 1 | `loop.py` | think → act → observe → repeat | An agent is a while-loop around a stateless model |
 | 2 | `tools.py` | `@tool`, six core tools, the path jail | A tool is one function; the schema is derived, never written twice |
 | 2 | `security.py` | `Policy`: allow, refuse, or ask | Capability and permission are different questions |
@@ -66,6 +128,8 @@ at the top of `security.py`.
 | 4 | `session.py` | JSONL transcript, torn-tail repair | A killed process is a resumable one |
 | 4 | `subagent.py` | `spawn_agent`, depth-capped | Delegation is a tool; the child's context is its own |
 | 4 | `harness.py` | `Harness` — the object that wires it all | Composition, not logic |
+| 5 | `models.py` | model→vendor routing, aliases | Route by prefix, so a model released today already works |
+| 5 | `config.py` | `~/.config/spartacus/env` | Keys belong outside the repo and outside your shell profile |
 | 5 | `cli.py` | headless and interactive front doors | The mode default is computed: ask when a human is there |
 | 5 | `fleet.py` | `run_fleet` — many agents, one directory each | Agents wait on sockets; waiting parallelises |
 
