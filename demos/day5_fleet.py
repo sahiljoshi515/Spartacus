@@ -38,8 +38,10 @@ from spartacus import Harness, run_fleet  # noqa: E402  (must follow the path fi
 from spartacus.skills import SKILL_FILE, SKILLS_DIR  # noqa: E402
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent / "projects"
-MODEL = os.environ.get("SPARTACUS_MODEL", "gemini-3.6-flash")
-WORKERS = 3
+MODEL = os.environ.get("SPARTACUS_MODEL", "gemini-3.1-flash-lite")
+# Two, not three: the free tier allows 15 requests a minute, and a third worker
+# spends its turns in the provider's retry backoff rather than doing work.
+WORKERS = int(os.environ.get("SPARTACUS_WORKERS", "2"))
 MAX_TURNS = 120
 CLIP = 110
 
@@ -73,6 +75,25 @@ below. Hold yourself to these as hard minimums, not as aspirations.
 REVIEW = ("Review every file you produced against the skill bar as a demanding "
           "design director; list 12 concrete deficiencies; fix them all; "
           "verify again.")
+
+# The remediation pass exists because a weak model answers "review and fix" by
+# regenerating the whole file, and a regenerated file is a shorter file: the
+# first review run cut one page from 13,981 bytes to 5,752 and lost most of its
+# copy. So this pass carries the measured shortfall rather than an adjective,
+# and it forbids the move that caused the damage. The bar is not lowered; the
+# instruction is made specific enough to act on.
+FIX = ("A mechanical check of what is on disk RIGHT NOW reports these failures:\n"
+       "%s\n\n"
+       "Fix every one of them. Rules, and they matter more than speed:\n"
+       "1. The file must end up LONGER and richer than it is now. If your edit "
+       "makes it shorter, you have deleted work and must put it back.\n"
+       "2. Never call write_file on a file without reading it in full first in "
+       "this same turn. Prefer edit_file to add what is missing.\n"
+       "3. Real prose, not filler: the word count is of visible body text, so "
+       "write the actual paragraphs a company would ship.\n"
+       "4. When you are finished, re-read the file and state four numbers: "
+       "sections, visible words, inline SVGs containing real path data, and "
+       "interactive behaviours wired in JavaScript.")
 
 PROJECTS = [
     {"name": "artisan-coffee", "task": (
@@ -154,10 +175,17 @@ def make_harness(workdir):
     prove it. A fresh harness would be told to review files it had never seen.
     """
     key = str(workdir)
+    name = os.path.basename(key)
     with _LOCK:
         if key not in _AGENTS:
-            _AGENTS[key] = Harness(workdir, model=MODEL, max_turns=MAX_TURNS,
-                                   on_event=printer(os.path.basename(key)))
+            agent = Harness(workdir, model=MODEL, max_turns=MAX_TURNS,
+                            on_event=printer(name))
+            # A re-run after a crash or a quota wall picks the transcript back
+            # up instead of paying for the work twice. This is the one place
+            # day 4 earns its keep in anger rather than in a demo.
+            if agent.resume():
+                print("[%s] resumed %d messages" % (name, len(agent.messages)))
+            _AGENTS[key] = agent
         return _AGENTS[key]
 
 
@@ -173,8 +201,8 @@ def prepare(project):
 def main():
     """Build, review, or both, for all projects or the ones named on the line."""
     phase = sys.argv[1] if len(sys.argv) > 1 else "both"
-    if phase not in ("build", "review", "both"):
-        sys.exit("usage: day5_fleet.py [build|review|both] [project ...]")
+    if phase not in ("build", "review", "fix", "both"):
+        sys.exit("usage: day5_fleet.py [build|review|fix|both] [project ...]")
     wanted = sys.argv[2:] or [p["name"] for p in PROJECTS]
     chosen = [p for p in PROJECTS if p["name"] in wanted]
 
@@ -192,6 +220,20 @@ def main():
         print("\n=== phase 2: review ===")
         review = [dict(job, task=REVIEW) for job in jobs]
         for r in run_fleet(review, make_harness, max_workers=WORKERS):
+            results[r["name"]] = r
+    if phase == "fix":
+        # Read the report card and hand each agent only its own failures.
+        sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+        import day5_verify
+        remedial = [dict(job, task=FIX % "\n".join("- " + f for f in gaps))
+                    for job in jobs
+                    for gaps in [day5_verify.shortfall(job["name"])] if gaps]
+        if not remedial:
+            print("[fix] every project already passes; nothing to remediate")
+        for job in remedial:
+            print("[fix] %s has %d failing checks"
+                  % (job["name"], job["task"].count("\n- ")))
+        for r in run_fleet(remedial, make_harness, max_workers=WORKERS):
             results[r["name"]] = r
 
     print("\n=== fleet result ===")

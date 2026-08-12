@@ -1,0 +1,1700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CYBER VIPER // The Ultimate Neural Reflex Engine</title>
+    <style>
+        :root {
+            --bg-base: #050814;
+            --bg-surface: #0b1120;
+            --bg-card: #131c33;
+            --bg-card-hover: #1e2d52;
+            
+            --accent-cyan: #00f0ff;
+            --accent-green: #10b981;
+            --accent-green-bright: #00ff88;
+            --accent-magenta: #f43f5e;
+            --accent-amber: #f59e0b;
+            --accent-purple: #8b5cf6;
+
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --text-dim: #475569;
+
+            --border-color: rgba(255, 255, 255, 0.08);
+            --border-glow: rgba(0, 240, 255, 0.25);
+
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+
+            --shadow-lg: 0 10px 30px -10px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 240, 255, 0.15);
+            --shadow-neon: 0 0 15px rgba(0, 240, 255, 0.3);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 240, 255, 0.08) 0%, transparent 70%),
+                radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.05) 0%, transparent 50%);
+            color: var(--text-main);
+            font-family: var(--font-sans);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Focus States for Accessibility */
+        button:focus-visible, 
+        a:focus-visible,
+        canvas:focus-visible {
+            outline: 2px solid var(--accent-cyan);
+            outline-offset: 4px;
+        }
+
+        /* Navigation Header */
+        .nav-header {
+            border-bottom: 1px solid var(--border-color);
+            background: rgba(11, 17, 32, 0.8);
+            backdrop-filter: blur(12px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: var(--font-mono);
+            font-weight: 800;
+            color: var(--text-main);
+            text-decoration: none;
+            letter-spacing: 1px;
+        }
+
+        .nav-brand span {
+            color: var(--accent-cyan);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 24px;
+        }
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--accent-cyan);
+        }
+
+        /* Main Layout Sections */
+        section {
+            padding: 5rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        h1, h2, h3 {
+            font-family: var(--font-mono);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1.5rem;
+        }
+
+        h1 {
+            font-size: 3rem;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-cyan) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            margin-bottom: 1.5rem;
+            max-width: 800px;
+        }
+
+        /* Section 1: Hero */
+        .hero-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            padding-top: 3rem;
+        }
+
+        @media (max-width: 992px) {
+            .hero-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        .hero-illustration {
+            width: 100%;
+            max-width: 450px;
+            margin: 0 auto;
+            filter: drop-shadow(0 0 20px rgba(0, 240, 255, 0.2));
+        }
+
+        /* Section 2: Game Container */
+        .game-section {
+            background: rgba(11, 17, 32, 0.5);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border-color);
+            padding: 3rem 2rem;
+        }
+
+        .game-grid-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr 280px;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 1100px) {
+            .game-grid-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panel Cards */
+        .panel-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .panel-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-title svg {
+            width: 16px;
+            height: 16px;
+            stroke: var(--accent-cyan);
+        }
+
+        /* Stats Display */
+        .stat-box {
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 3px;
+            height: 100%;
+            background: var(--stat-accent, var(--accent-cyan));
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: var(--font-mono);
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            font-family: var(--font-mono);
+            color: var(--text-main);
+            line-height: 1.1;
+        }
+
+        .stat-value.highlight {
+            color: var(--accent-green-bright);
+            text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 4px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            font-family: var(--font-mono);
+            color: var(--text-muted);
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background: var(--bg-card);
+            border-radius: 4px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-green-bright));
+            transition: width 0.3s ease;
+            box-shadow: 0 0 8px var(--accent-cyan);
+        }
+
+        /* Canvas Wrapper */
+        .canvas-wrapper {
+            position: relative;
+            background: #050811;
+            border: 2px solid rgba(0, 240, 255, 0.25);
+            border-radius: var(--radius-lg);
+            padding: 12px;
+            box-shadow: var(--shadow-lg), inset 0 0 30px rgba(0, 0, 0, 0.8);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        canvas {
+            display: block;
+            background: #03060d;
+            border-radius: var(--radius-md);
+            box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
+            max-width: 100%;
+            height: auto;
+        }
+
+        /* Overlay Screens */
+        .overlay-screen {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            right: 12px;
+            bottom: 12px;
+            background: rgba(8, 11, 18, 0.92);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            z-index: 10;
+            padding: 30px;
+            text-align: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .overlay-screen.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .overlay-title {
+            font-size: 2.2rem;
+            font-weight: 900;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .overlay-title.game-over {
+            color: var(--accent-magenta);
+            text-shadow: 0 0 20px rgba(244, 63, 94, 0.5);
+        }
+
+        .overlay-title.paused {
+            color: var(--accent-cyan);
+            text-shadow: 0 0 20px rgba(0, 240, 255, 0.5);
+        }
+
+        .overlay-title.start {
+            color: var(--accent-green-bright);
+            text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+        }
+
+        .overlay-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 320px;
+            line-height: 1.5;
+        }
+
+        .primary-btn {
+            background: linear-gradient(135deg, var(--accent-cyan), #00a8ff);
+            color: #000;
+            font-weight: 800;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 14px 32px;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .primary-btn:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.7);
+        }
+
+        .primary-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        /* Keybinds visual legend */
+        .key-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            width: 140px;
+            margin: 0 auto;
+        }
+
+        .key-cap {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-bottom: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
+            font-weight: 700;
+            height: 38px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.1s ease;
+        }
+
+        .key-cap.pressed {
+            background: var(--accent-cyan);
+            color: #000;
+            border-color: var(--accent-cyan);
+            border-bottom-width: 1px;
+            transform: translateY(2px);
+            box-shadow: 0 0 10px var(--accent-cyan);
+        }
+
+        .controls-hint-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .controls-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: var(--radius-sm);
+        }
+
+        .badge-key {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--text-main);
+        }
+
+        /* Mobile Virtual Touch D-Pad */
+        .mobile-controls {
+            display: none;
+            margin-top: 20px;
+            width: 100%;
+        }
+
+        @media (max-width: 1100px) {
+            .mobile-controls {
+                display: flex;
+                justify-content: center;
+                gap: 30px;
+            }
+        }
+
+        .dpad {
+            display: grid;
+            grid-template-columns: repeat(3, 55px);
+            grid-template-rows: repeat(3, 55px);
+            gap: 8px;
+        }
+
+        .dpad-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: all 0.1s ease;
+        }
+
+        .dpad-btn:active {
+            background: var(--accent-cyan);
+            color: #000;
+            transform: scale(0.95);
+        }
+
+        /* Section 3: Lore */
+        .lore-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        @media (max-width: 992px) {
+            .lore-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        /* Section 4: Features */
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .feature-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 2rem;
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent-cyan);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            margin-bottom: 1.5rem;
+            color: var(--accent-cyan);
+        }
+
+        /* Section 5: Tech Stack */
+        .tech-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        @media (max-width: 992px) {
+            .tech-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        /* Section 6: Leaderboard */
+        .leaderboard-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 2rem;
+            background: var(--bg-surface);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .leaderboard-table th, .leaderboard-table td {
+            padding: 1rem 1.5rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .leaderboard-table th {
+            background: rgba(255, 255, 255, 0.02);
+            font-family: var(--font-mono);
+            color: var(--accent-cyan);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+        }
+
+        .leaderboard-table tr:hover td {
+            background: rgba(255, 255, 255, 0.01);
+        }
+
+        /* Section 7: FAQ Accordion */
+        .faq-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .faq-item {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 1.5rem 2rem;
+        }
+
+        .faq-question {
+            font-family: var(--font-mono);
+            color: var(--text-main);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Section 8: Community */
+        .community-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        @media (max-width: 992px) {
+            .community-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        /* Section 9: Contact */
+        .contact-layout {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        @media (max-width: 992px) {
+            .contact-layout {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+        }
+
+        /* Footer */
+        footer {
+            background: #03050a;
+            border-top: 1px solid var(--border-color);
+            padding: 3rem 2rem;
+            text-align: center;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+        }
+
+        /* Header Actions */
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .icon-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .icon-btn:hover {
+            background: var(--bg-card-hover);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        .icon-btn.active {
+            background: rgba(0, 240, 255, 0.15);
+            border-color: var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        .icon-btn svg {
+            width: 20px;
+            height: 20px;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navigation Header -->
+    <header class="nav-header">
+        <div class="nav-container">
+            <a href="#" class="nav-brand">
+                <span>CYBER</span>_VIPER
+            </a>
+            <nav class="nav-links">
+                <a href="#hero" class="nav-link">Home</a>
+                <a href="#game" class="nav-link">Interface</a>
+                <a href="#lore" class="nav-link">Lore</a>
+                <a href="#features" class="nav-link">Features</a>
+                <a href="#tech" class="nav-link">Specs</a>
+                <a href="#leaderboard" class="nav-link">Leaderboard</a>
+                <a href="#faq" class="nav-link">FAQ</a>
+                <a href="#community" class="nav-link">Collective</a>
+                <a href="#contact" class="nav-link">Command</a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Section 1: Hero -->
+    <section id="hero" class="hero-layout">
+        <div>
+            <h1>The Future of Reflex Conditioning</h1>
+            <p>Welcome to the Cyber Viper neural training environment. Designed for elite reflex conditioning, our proprietary grid-engine delivers unparalleled precision and speed. Whether you are a casual player or a competitive speed-runner, the Viper interface adapts to your cognitive load, pushing you to the edge of human capability. The Grid is a place of infinite possibility, where data streams converge and neural pathways are forged in the fires of competition. As you enter the interface, you are not merely playing a game; you are engaging in a high-fidelity simulation that tests the limits of your reaction time, spatial awareness, and strategic planning.</p>
+            <p>The Viper engine is the culmination of years of research into human-computer interaction, designed to bridge the gap between biological thought and digital execution. Every movement you make, every decision you take, is recorded and analyzed by our advanced telemetry systems, providing you with the data you need to improve your performance. Join the thousands of pilots who have already mastered the Grid and see if you have what it takes to become a legend in the world of Cyber Viper.</p>
+            <a href="#game" class="primary-btn" style="display: inline-flex; text-decoration: none; width: fit-content;">Access Interface</a>
+        </div>
+        <div class="hero-illustration">
+            <!-- SVG 1: Hero Illustration -->
+            <svg viewBox="0 0 400 400" width="100%" height="100%">
+                <defs>
+                    <linearGradient id="cyanGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                        <stop offset="0%" stop-color="#00f0ff" />
+                        <stop offset="100%" stop-color="#8b5cf6" />
+                    </linearGradient>
+                </defs>
+                <rect x="10" y="10" width="380" height="380" rx="20" fill="none" stroke="url(#cyanGrad)" stroke-width="2" stroke-dasharray="10 5" />
+                <path d="M50 200 C50 100, 150 50, 200 50 C250 50, 350 100, 350 200 C350 300, 250 350, 200 350 C150 350, 50 300, 50 200 Z" fill="none" stroke="#00f0ff" stroke-width="3" />
+                <path d="M100 200 L300 200 M200 100 L200 300" stroke="rgba(0, 240, 255, 0.3)" stroke-width="1" />
+                <circle cx="200" cy="200" r="80" fill="none" stroke="#10b981" stroke-width="2" />
+                <path d="M150 150 L250 250 M250 150 L150 250" stroke="rgba(16, 185, 129, 0.4)" stroke-width="2" />
+                <circle cx="200" cy="200" r="10" fill="#00f0ff" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Section 2: Game Board -->
+    <section id="game" class="game-section">
+        <div class="game-grid-layout">
+            
+            <!-- Left Panel: Telemetry -->
+            <aside class="panel-card">
+                <div class="panel-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 20V10M12 20V4M6 20v-6"></path>
+                    </svg>
+                    TELEMETRY
+                </div>
+
+                <div class="stat-box" style="--stat-accent: var(--accent-cyan)">
+                    <div class="stat-label">CURRENT SCORE</div>
+                    <div id="val-score" class="stat-value">0</div>
+                </div>
+
+                <div class="stat-box" style="--stat-accent: var(--accent-amber)">
+                    <div class="stat-label">HIGH SCORE</div>
+                    <div id="val-highscore" class="stat-value highlight">0</div>
+                </div>
+
+                <div class="stat-box" style="--stat-accent: var(--accent-green-bright)">
+                    <div class="stat-label">SPEED LEVEL</div>
+                    <div id="val-level" class="stat-value">LVL 1</div>
+                    <div class="progress-container">
+                        <div class="progress-header">
+                            <span>Next Speedup</span>
+                            <span id="val-food-progress">0/5</span>
+                        </div>
+                        <div class="progress-track">
+                            <div id="bar-progress" class="progress-fill"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-box" style="--stat-accent: var(--accent-purple)">
+                    <div class="stat-label">TICK RATE</div>
+                    <div id="val-speed" class="stat-value" style="font-size: 1.3rem;">140 ms</div>
+                </div>
+            </aside>
+
+            <!-- Center Panel: Canvas Game Board -->
+            <div class="canvas-wrapper">
+                <canvas id="game-canvas" width="500" height="500" tabindex="0"></canvas>
+
+                <!-- Start Overlay -->
+                <div id="overlay-start" class="overlay-screen active">
+                    <h2 class="overlay-title start">READY VIPER</h2>
+                    <p class="overlay-desc">Use Arrow Keys or WASD to navigate. Eat glowing energy Orbs to grow and increase speed!</p>
+                    <button id="btn-start-game" class="primary-btn">
+                        START MISSION
+                    </button>
+                </div>
+
+                <!-- Pause Overlay -->
+                <div id="overlay-pause" class="overlay-screen">
+                    <h2 class="overlay-title paused">SYSTEM PAUSED</h2>
+                    <p class="overlay-desc">Press SPACE or P to resume your run.</p>
+                    <button id="btn-resume-game" class="primary-btn">RESUME</button>
+                </div>
+
+                <!-- Game Over Overlay -->
+                <div id="overlay-gameover" class="overlay-screen">
+                    <h2 class="overlay-title game-over">SYSTEM CRASH</h2>
+                    <p id="gameover-summary" class="overlay-desc">Final Score: 0</p>
+                    <button id="btn-restart-game" class="primary-btn">PLAY AGAIN</button>
+                </div>
+            </div>
+
+            <!-- Right Panel: Controls & Legend -->
+            <aside class="panel-card">
+                <div class="panel-title">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="2" y="6" width="20" height="12" rx="2"></rect>
+                        <path d="M6 12h4M8 10v4M15 11h.01M18 13h.01"></path>
+                    </svg>
+                    CONTROLS LEGEND
+                </div>
+
+                <div style="text-align: center; margin: 10px 0;">
+                    <div class="key-grid">
+                        <div></div>
+                        <div id="key-w" class="key-cap">W / ▲</div>
+                        <div></div>
+                        <div id="key-a" class="key-cap">A / ◀</div>
+                        <div id="key-s" class="key-cap">S / ▼</div>
+                        <div id="key-d" class="key-cap">D / ▶</div>
+                    </div>
+                </div>
+
+                <div class="controls-hint-list">
+                    <div class="controls-row">
+                        <span>Steer Viper</span>
+                        <div><span class="badge-key">WASD</span> <span class="badge-key">ARROWS</span></div>
+                    </div>
+                    <div class="controls-row">
+                        <span>Pause / Resume</span>
+                        <div><span class="badge-key">P</span> <span class="badge-key">SPACE</span></div>
+                    </div>
+                    <div class="controls-row">
+                        <span>Restart Game</span>
+                        <div><span class="badge-key">R</span></div>
+                    </div>
+                    <div class="controls-row">
+                        <span>Toggle Sound</span>
+                        <div><span class="badge-key">M</span></div>
+                    </div>
+                </div>
+
+                <div style="border-top: 1px solid var(--border-color); padding-top: 12px; margin-top: 10px; font-size: 0.75rem; color: var(--text-muted); line-height: 1.4;">
+                    <strong style="color: var(--accent-cyan);">Grid Rule:</strong> You cannot reverse directly into your own body. Speed increments every 5 eaten items!
+                </div>
+
+                <!-- Audio & Quick Actions -->
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <button id="btn-sound" class="icon-btn active" title="Toggle Sound FX (M)">
+                        <svg viewBox="0 0 24 24">
+                            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                            <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+                        </svg>
+                    </button>
+                    <button id="btn-pause" class="icon-btn" title="Pause / Resume (P or Space)">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="6" y="4" width="4" height="16"></rect>
+                            <rect x="14" y="4" width="4" height="16"></rect>
+                        </svg>
+                    </button>
+                    <button id="btn-restart" class="icon-btn" title="Restart Game (R)">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="23 4 23 10 17 10"></polyline>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                        </svg>
+                    </button>
+                </div>
+            </aside>
+
+        </div>
+
+        <!-- Mobile D-Pad Controls -->
+        <div class="mobile-controls">
+            <div class="dpad">
+                <div></div>
+                <button class="dpad-btn" id="dpad-up">▲</button>
+                <div></div>
+                <button class="dpad-btn" id="dpad-left">◀</button>
+                <button class="dpad-btn" id="dpad-down">▼</button>
+                <button class="dpad-btn" id="dpad-right">▶</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 3: Lore -->
+    <section id="lore" class="lore-layout">
+        <div>
+            <h2>The Digital Underworld</h2>
+            <p>In the year 2099, the physical world has become a slow, decaying relic. Humanity has migrated to the Grid—a vast, interconnected web of data streams and neural pathways. Cyber Viper was born in the shadows of the central server, a rogue program designed to navigate the most complex data structures at light speed. As a Viper Pilot, your task is to consume data packets, expand your neural footprint, and avoid the catastrophic system crashes that await the unwary. The Grid is unforgiving, but for those who master the flow, it offers infinite expansion.</p>
+            <p>The lore of the Grid is deep and complex, filled with tales of legendary pilots who have navigated the most dangerous sectors and emerged victorious. Some say that the Grid is alive, a sentient entity that learns and adapts to the presence of those who enter its domain. Others believe that it is a reflection of our own collective consciousness, a mirror held up to the hopes and fears of humanity. Whatever the truth may be, one thing is certain: the Grid is the future, and Cyber Viper is your key to unlocking its secrets. As you delve deeper into the lore, you will discover the hidden history of the Grid, the origins of the Viper program, and the true purpose of the data packets you consume.</p>
+        </div>
+        <div>
+            <!-- SVG 2: Lore Illustration -->
+            <svg viewBox="0 0 400 400" width="100%" height="100%">
+                <defs>
+                    <radialGradient id="portalGlow" cx="50%" cy="50%" r="50%">
+                        <stop offset="0%" stop-color="#00f0ff" stop-opacity="0.3" />
+                        <stop offset="100%" stop-color="#050814" stop-opacity="0" />
+                    </radialGradient>
+                </defs>
+                <rect x="0" y="0" width="400" height="400" fill="url(#portalGlow)" />
+                <circle cx="200" cy="200" r="120" fill="none" stroke="#8b5cf6" stroke-width="2" stroke-dasharray="5 5" />
+                <circle cx="200" cy="200" r="90" fill="none" stroke="#00f0ff" stroke-width="3" />
+                <path d="M200 50 L200 350 M50 200 L350 200" stroke="rgba(0, 240, 255, 0.2)" stroke-width="1" />
+                <path d="M110 110 L290 290 M290 110 L110 290" stroke="rgba(139, 92, 246, 0.2)" stroke-width="1" />
+                <polygon points="200,150 230,220 170,220" fill="none" stroke="#10b981" stroke-width="2" />
+                <circle cx="200" cy="180" r="5" fill="#00f0ff" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Section 4: Features -->
+    <section id="features">
+        <h2>Engine Features</h2>
+        <p>The Cyber Viper engine is packed with features that set it apart from any other neural training simulation on the market. Our proprietary grid-engine is designed for maximum performance, with a focus on low latency, high frame rates, and precise input handling. The engine also features a dynamic difficulty system that adjusts to your performance in real-time, ensuring that you are always challenged but never overwhelmed.</p>
+        <div class="features-grid">
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+                </svg>
+                <h3>Adaptive Tick-Rate</h3>
+                <p>The engine dynamically adjusts to your performance, ensuring a smooth, responsive experience that scales with your skill level.</p>
+            </div>
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                    <path d="M19 10v1a7 7 0 0 1-14 0v-1"></path>
+                </svg>
+                <h3>Neural Audio Feedback</h3>
+                <p>Real-time synthesized audio provides haptic-like feedback for every interaction, enhancing immersion and reaction times.</p>
+            </div>
+            <div class="feature-card">
+                <svg class="feature-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path>
+                </svg>
+                <h3>Persistent Telemetry</h3>
+                <p>Your high scores and performance metrics are etched into local storage, providing a permanent record of your mastery.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 5: Tech Stack -->
+    <section id="tech" class="tech-layout">
+        <div>
+            <h2>Technical Architecture</h2>
+            <p>Built on a pure, dependency-free HTML5 stack, Cyber Viper utilizes the Canvas API for high-performance rendering and the Web Audio API for low-latency sound synthesis. Our custom game loop, powered by requestAnimationFrame, ensures that every frame is rendered with sub-millisecond precision, minimizing input lag and maximizing visual clarity.</p>
+            <p>The engine is also highly optimized for a wide range of devices, from low-end laptops to high-end gaming rigs, ensuring that you get the best possible experience regardless of your hardware. Our commitment to performance is matched only by our commitment to quality, and we have spent countless hours testing and refining every aspect of the engine to ensure that it meets the highest standards of excellence.</p>
+        </div>
+        <div>
+            <!-- SVG 3: Tech Stack Illustration -->
+            <svg viewBox="0 0 400 400" width="100%" height="100%">
+                <rect x="50" y="50" width="300" height="300" rx="10" fill="none" stroke="#00f0ff" stroke-width="2" />
+                <path d="M100 100 L300 100 M100 200 L300 200 M100 300 L300 300" stroke="rgba(0, 240, 255, 0.2)" stroke-width="1" />
+                <path d="M100 100 L100 300 M200 100 L200 300 M300 100 L300 300" stroke="rgba(0, 240, 255, 0.2)" stroke-width="1" />
+                <circle cx="100" cy="100" r="8" fill="#10b981" />
+                <circle cx="200" cy="100" r="8" fill="#00f0ff" />
+                <circle cx="300" cy="100" r="8" fill="#8b5cf6" />
+                <circle cx="100" cy="200" r="8" fill="#f59e0b" />
+                <circle cx="200" cy="200" r="12" fill="#f43f5e" />
+                <circle cx="300" cy="200" r="8" fill="#10b981" />
+                <circle cx="100" cy="300" r="8" fill="#8b5cf6" />
+                <circle cx="200" cy="300" r="8" fill="#00f0ff" />
+                <circle cx="300" cy="300" r="8" fill="#f59e0b" />
+                <path d="M100 100 L200 200 L300 300" stroke="#00f0ff" stroke-width="2" fill="none" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Section 6: Leaderboard -->
+    <section id="leaderboard">
+        <h2>Global Leaderboard</h2>
+        <p>The leaderboard is currently in local-mode. Connect to the central server to sync your scores with the global collective of Viper Pilots. Our global leaderboard is the ultimate test of skill, where the best of the best compete for the top spot on the grid. With thousands of pilots from around the world, the competition is fierce, and only the most skilled and determined will make it to the top.</p>
+        <table class="leaderboard-table">
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>Pilot</th>
+                    <th>Sector</th>
+                    <th>High Score</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>#1</td>
+                    <td>VIPER_ZERO</td>
+                    <td>Sector 7-G</td>
+                    <td>142,500</td>
+                </tr>
+                <tr>
+                    <td>#2</td>
+                    <td>NEO_NEURAL</td>
+                    <td>Sector 4-F</td>
+                    <td>128,900</td>
+                </tr>
+                <tr>
+                    <td>#3</td>
+                    <td>GRID_RUNNER</td>
+                    <td>Sector 9-A</td>
+                    <td>115,400</td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+    <!-- Section 7: FAQ Accordion -->
+    <section id="faq">
+        <h2>Frequently Asked Questions</h2>
+        <p>Everything you need to know about navigating the Grid and optimizing your Viper's performance.</p>
+        <div class="faq-list">
+            <div class="faq-item">
+                <h3 class="faq-question">Q: How do I steer the Viper?</h3>
+                <p>A: You can use either the standard Arrow Keys or the WASD keys on your keyboard. The interface is designed to accept both inputs simultaneously for maximum comfort.</p>
+            </div>
+            <div class="faq-item">
+                <h3 class="faq-question">Q: Can I pause the simulation?</h3>
+                <p>A: Yes, you can pause the game at any time by pressing the Spacebar or the P key. Pressing either key again will resume the simulation immediately.</p>
+            </div>
+            <div class="faq-item">
+                <h3 class="faq-question">Q: How does the speedup mechanism work?</h3>
+                <p>A: Every time you consume 5 data packets (food), the Viper's engine levels up, reducing the grid tick rate (making the game faster) and increasing your score multiplier.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Section 8: Community -->
+    <section id="community" class="community-layout">
+        <div>
+            <h2>Join the Collective</h2>
+            <p>Connect with other pilots on the official forums. Share your strategies, discuss speed-running techniques, and participate in weekly grid-clearing tournaments. The Cyber Viper community is a vibrant and welcoming group of pilots who are always ready to help each other out and to share their passion for the game.</p>
+            <p>Whether you are looking for tips on how to improve your score, or you just want to hang out and chat with other fans of the game, the forums are the perfect place to be. And with our active social media presence, you can stay up-to-date on all the latest news, updates, and events.</p>
+        </div>
+        <div>
+            <!-- SVG 4: Community Illustration -->
+            <svg viewBox="0 0 400 400" width="100%" height="100%">
+                <circle cx="200" cy="200" r="140" fill="none" stroke="#00f0ff" stroke-width="1" />
+                <circle cx="200" cy="200" r="100" fill="none" stroke="#8b5cf6" stroke-width="1" stroke-dasharray="5 5" />
+                <circle cx="200" cy="200" r="30" fill="none" stroke="#10b981" stroke-width="2" />
+                <circle cx="200" cy="60" r="15" fill="#00f0ff" />
+                <circle cx="200" cy="340" r="15" fill="#00f0ff" />
+                <circle cx="60" cy="200" r="15" fill="#8b5cf6" />
+                <circle cx="340" cy="200" r="15" fill="#8b5cf6" />
+                <path d="M200 75 L200 170 M200 230 L200 325 M75 200 L170 200 M230 200 L325 200" stroke="rgba(0, 240, 255, 0.4)" stroke-width="2" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Section 9: Contact -->
+    <section id="contact" class="contact-layout">
+        <div>
+            <h2>Contact Command</h2>
+            <p>For technical support or to report a system anomaly, please contact the central command at support@cyberviper.io. Our support team is available 24/7 to help you with any issues you may have, and we are committed to providing you with the best possible experience.</p>
+            <p>We are always looking for feedback and suggestions, so if you have any ideas on how we can improve the game, please don't hesitate to let us know. We value your input and we are always working to make Cyber Viper the best it can be.</p>
+        </div>
+        <div>
+            <!-- SVG 5: Contact Illustration -->
+            <svg viewBox="0 0 400 400" width="100%" height="100%">
+                <rect x="100" y="100" width="200" height="200" rx="15" fill="none" stroke="#00f0ff" stroke-width="2" />
+                <path d="M100 150 L200 220 L300 150" fill="none" stroke="#10b981" stroke-width="3" />
+                <circle cx="200" cy="250" r="20" fill="none" stroke="#8b5cf6" stroke-width="2" />
+                <path d="M200 240 L200 260 M190 250 L210 250" stroke="#00f0ff" stroke-width="2" />
+            </svg>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        &copy; 2099 Cyber Viper Industries. All rights reserved. // Neural Interface Active
+    </footer>
+
+    <script>
+        (() => {
+            // Game Constants & Configuration
+            const GRID_SIZE = 24; // 24x24 cells
+            const BASE_TICK_RATE = 140; // ms per grid move at level 1
+            const SPEED_INCREMENT = 10; // ms faster per 5 food
+            const MIN_TICK_RATE = 45; // cap maximum speed
+            const FOOD_PER_LEVEL = 5;
+
+            // Audio Synthesizer (Web Audio API)
+            class SoundEngine {
+                constructor() {
+                    this.ctx = null;
+                    this.muted = false;
+                }
+
+                init() {
+                    if (!this.ctx) {
+                        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+                        if (AudioCtx) this.ctx = new AudioCtx();
+                    }
+                    if (this.ctx && this.ctx.state === 'suspended') {
+                        this.ctx.resume();
+                    }
+                }
+
+                playEatSound() {
+                    if (this.muted || !this.ctx) return;
+                    try {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(440, this.ctx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(880, this.ctx.currentTime + 0.1);
+                        
+                        gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.1);
+
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start();
+                        osc.stop(this.ctx.currentTime + 0.1);
+                    } catch (e) {}
+                }
+
+                playLevelUpSound() {
+                    if (this.muted || !this.ctx) return;
+                    try {
+                        const now = this.ctx.currentTime;
+                        [523.25, 659.25, 783.99, 1046.50].forEach((freq, idx) => {
+                            const osc = this.ctx.createOscillator();
+                            const gain = this.ctx.createGain();
+                            osc.type = 'triangle';
+                            osc.frequency.value = freq;
+                            gain.gain.setValueAtTime(0.15, now + idx * 0.06);
+                            gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.06 + 0.12);
+                            osc.connect(gain);
+                            gain.connect(this.ctx.destination);
+                            osc.start(now + idx * 0.06);
+                            osc.stop(now + idx * 0.06 + 0.12);
+                        });
+                    } catch (e) {}
+                }
+
+                playCrashSound() {
+                    if (this.muted || !this.ctx) return;
+                    try {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'sawtooth';
+                        osc.frequency.setValueAtTime(220, this.ctx.currentTime);
+                        osc.frequency.exponentialRampToValueAtTime(40, this.ctx.currentTime + 0.35);
+
+                        gain.gain.setValueAtTime(0.3, this.ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.35);
+
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start();
+                        osc.stop(this.ctx.currentTime + 0.35);
+                    } catch (e) {}
+                }
+
+                playClickSound() {
+                    if (this.muted || !this.ctx) return;
+                    try {
+                        const osc = this.ctx.createOscillator();
+                        const gain = this.ctx.createGain();
+                        osc.type = 'square';
+                        osc.frequency.setValueAtTime(800, this.ctx.currentTime);
+                        gain.gain.setValueAtTime(0.05, this.ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + 0.04);
+                        osc.connect(gain);
+                        gain.connect(this.ctx.destination);
+                        osc.start();
+                        osc.stop(this.ctx.currentTime + 0.04);
+                    } catch (e) {}
+                }
+            }
+
+            const sounds = new SoundEngine();
+
+            // DOM Elements
+            const canvas = document.getElementById('game-canvas');
+            const ctx = canvas.getContext('2d');
+
+            const elScore = document.getElementById('val-score');
+            const elHighScore = document.getElementById('val-highscore');
+            const elLevel = document.getElementById('val-level');
+            const elSpeed = document.getElementById('val-speed');
+            const elFoodProgress = document.getElementById('val-food-progress');
+            const barProgress = document.getElementById('bar-progress');
+
+            const overlayStart = document.getElementById('overlay-start');
+            const overlayPause = document.getElementById('overlay-pause');
+            const overlayGameOver = document.getElementById('overlay-gameover');
+            const elGameOverSummary = document.getElementById('gameover-summary');
+
+            const btnSound = document.getElementById('btn-sound');
+            const btnPause = document.getElementById('btn-pause');
+            const btnRestart = document.getElementById('btn-restart');
+            const btnStartGame = document.getElementById('btn-start-game');
+            const btnResumeGame = document.getElementById('btn-resume-game');
+            const btnRestartGame = document.getElementById('btn-restart-game');
+
+            // Key indicators
+            const keyMapUI = {
+                'W': document.getElementById('key-w'),
+                'A': document.getElementById('key-a'),
+                'S': document.getElementById('key-s'),
+                'D': document.getElementById('key-d')
+            };
+
+            // Responsive HiDPI Canvas Setup
+            function setupCanvasSize() {
+                const dpr = window.devicePixelRatio || 1;
+                const size = Math.min(window.innerWidth - 60, 500);
+                canvas.style.width = `${size}px`;
+                canvas.style.height = `${size}px`;
+                canvas.width = Math.floor(size * dpr);
+                canvas.height = Math.floor(size * dpr);
+                ctx.scale(dpr, dpr);
+            }
+            window.addEventListener('resize', setupCanvasSize);
+            setupCanvasSize();
+
+            // Game State Variables
+            let state = 'MENU'; // 'MENU', 'PLAYING', 'PAUSED', 'GAMEOVER'
+            let lastTime = 0;
+            let accumulator = 0;
+            
+            let snake = [];
+            let currentDir = { x: 1, y: 0 };
+            let directionQueue = [];
+            let food = { x: 0, y: 0, pulse: 0 };
+            let particles = [];
+
+            let score = 0;
+            let highScore = parseInt(localStorage.getItem('viper_highscore') || '0', 10);
+            let foodsEaten = 0;
+            let level = 1;
+            let currentTickRate = BASE_TICK_RATE;
+
+            elHighScore.textContent = highScore.toString();
+
+            // Particle System
+            function spawnParticles(gx, gy, color, count = 12) {
+                const canvasDisplayWidth = parseFloat(canvas.style.width);
+                const cellSize = canvasDisplayWidth / GRID_SIZE;
+                const cx = gx * cellSize + cellSize / 2;
+                const cy = gy * cellSize + cellSize / 2;
+
+                for (let i = 0; i < count; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const speed = 1.5 + Math.random() * 3.5;
+                    particles.push({
+                        x: cx,
+                        y: cy,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        life: 1.0,
+                        decay: 0.03 + Math.random() * 0.03,
+                        color: color,
+                        size: 2 + Math.random() * 3
+                    });
+                }
+            }
+
+            function updateAndDrawParticles() {
+                for (let i = particles.length - 1; i >= 0; i--) {
+                    const p = particles[i];
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    p.life -= p.decay;
+
+                    if (p.life <= 0) {
+                        particles.splice(i, 1);
+                        continue;
+                    }
+
+                    ctx.save();
+                    ctx.globalAlpha = p.life;
+                    ctx.fillStyle = p.color;
+                    ctx.shadowColor = p.color;
+                    ctx.shadowBlur = 6;
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size * p.life, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            }
+
+            // Food Spawner (Ensures clear of snake)
+            function spawnFood() {
+                const occupied = new Set();
+                snake.forEach(seg => occupied.add(`${seg.x},${seg.y}`));
+
+                const freeCells = [];
+                for (let x = 0; x < GRID_SIZE; x++) {
+                    for (let y = 0; y < GRID_SIZE; y++) {
+                        if (!occupied.has(`${x},${y}`)) {
+                            freeCells.push({ x, y });
+                        }
+                    }
+                }
+
+                if (freeCells.length === 0) {
+                    // Snake filled whole grid! Victory scenario
+                    triggerGameOver(true);
+                    return;
+                }
+
+                const choice = freeCells[Math.floor(Math.random() * freeCells.length)];
+                food = { x: choice.x, y: choice.y, pulse: 0 };
+            }
+
+            // Initialize New Game
+            function resetGame() {
+                const startX = Math.floor(GRID_SIZE / 2);
+                const startY = Math.floor(GRID_SIZE / 2);
+
+                snake = [
+                    { x: startX, y: startY },
+                    { x: startX - 1, y: startY },
+                    { x: startX - 2, y: startY }
+                ];
+
+                currentDir = { x: 1, y: 0 };
+                directionQueue = [];
+                score = 0;
+                foodsEaten = 0;
+                level = 1;
+                currentTickRate = BASE_TICK_RATE;
+                particles = [];
+
+                updateUI();
+                spawnFood();
+            }
+
+            // Update UI Telemetry
+            function updateUI() {
+                elScore.textContent = score.toString();
+                elHighScore.textContent = highScore.toString();
+                elLevel.textContent = `LVL ${level}`;
+                elSpeed.textContent = `${currentTickRate} ms`;
+
+                const levelProgress = foodsEaten % FOOD_PER_LEVEL;
+                elFoodProgress.textContent = `${levelProgress}/${FOOD_PER_LEVEL}`;
+                barProgress.style.width = `${(levelProgress / FOOD_PER_LEVEL) * 100}%`;
+            }
+
+            // Game Logic Step (Grid Movement Tick)
+            function tick() {
+                if (state !== 'PLAYING') return;
+
+                // Process direction queue
+                if (directionQueue.length > 0) {
+                    const nextDir = directionQueue.shift();
+                    // Check reverse direction constraint
+                    if (!(nextDir.x === -currentDir.x && nextDir.y === -currentDir.y)) {
+                        currentDir = nextDir;
+                    }
+                }
+
+                const head = snake[0];
+                const newHead = {
+                    x: head.x + currentDir.x,
+                    y: head.y + currentDir.y
+                };
+
+                // Wall collision check
+                if (newHead.x < 0 || newHead.x >= GRID_SIZE || newHead.y < 0 || newHead.y >= GRID_SIZE) {
+                    triggerGameOver(false);
+                    return;
+                }
+
+                // Self collision check
+                for (let i = 0; i < snake.length; i++) {
+                    if (snake[i].x === newHead.x && snake[i].y === newHead.y) {
+                        triggerGameOver(false);
+                        return;
+                    }
+                }
+
+                // Move snake
+                snake.unshift(newHead);
+
+                // Food collision check
+                if (newHead.x === food.x && newHead.y === food.y) {
+                    // Eat sound
+                    sounds.playEatSound();
+
+                    // Spawn particle explosion
+                    spawnParticles(food.x, food.y, '#00f0ff', 16);
+
+                    // Update Score
+                    score += 100 * level;
+                    foodsEaten++;
+
+                    if (score > highScore) {
+                        highScore = score;
+                        localStorage.setItem('viper_highscore', highScore.toString());
+                    }
+
+                    // Level Up / Speedup check every 5 foods
+                    if (foodsEaten > 0 && foodsEaten % FOOD_PER_LEVEL === 0) {
+                        level++;
+                        currentTickRate = Math.max(MIN_TICK_RATE, BASE_TICK_RATE - (level - 1) * SPEED_INCREMENT);
+                        sounds.playLevelUpSound();
+                    }
+
+                    updateUI();
+                    spawnFood();
+                } else {
+                    // Remove tail
+                    snake.pop();
+                }
+            }
+
+            // Game Over Trigger
+            function triggerGameOver(victory = false) {
+                state = 'GAMEOVER';
+                sounds.playCrashSound();
+
+                // Burst particles at head
+                if (snake.length > 0) {
+                    spawnParticles(snake[0].x, snake[0].y, '#f43f5e', 24);
+                }
+
+                elGameOverSummary.textContent = victory 
+                    ? `UNBELIEVABLE! You cleared the entire grid! Score: ${score}`
+                    : `Snake crashed into structure. Final Score: ${score}`;
+
+                overlayGameOver.classList.add('active');
+            }
+
+            // Rendering Engine
+            function render() {
+                const displayWidth = parseFloat(canvas.style.width);
+                const cellSize = displayWidth / GRID_SIZE;
+
+                // Clear Background
+                ctx.fillStyle = '#03060d';
+                ctx.fillRect(0, 0, displayWidth, displayWidth);
+
+                // Draw Subtle Grid Lines
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+                ctx.lineWidth = 1;
+                for (let i = 0; i <= GRID_SIZE; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(i * cellSize, 0);
+                    ctx.lineTo(i * cellSize, displayWidth);
+                    ctx.stroke();
+
+                    ctx.beginPath();
+                    ctx.moveTo(0, i * cellSize);
+                    ctx.lineTo(displayWidth, i * cellSize);
+                    ctx.stroke();
+                }
+
+                // Draw Food
+                if (food) {
+                    food.pulse += 0.08;
+                    const pulseScale = 0.85 + Math.sin(food.pulse) * 0.15;
+                    const fx = food.x * cellSize + cellSize / 2;
+                    const fy = food.y * cellSize + cellSize / 2;
+                    const radius = (cellSize / 2 - 2) * pulseScale;
+
+                    ctx.save();
+                    ctx.shadowColor = '#00f0ff';
+                    ctx.shadowBlur = 12;
+                    ctx.fillStyle = '#00f0ff';
+                    ctx.beginPath();
+                    ctx.arc(fx, fy, radius, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Inner glowing core
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(fx, fy, radius * 0.4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+
+                // Draw Snake Body & Head
+                for (let i = snake.length - 1; i >= 0; i--) {
+                    const seg = snake[i];
+                    const x = seg.x * cellSize;
+                    const y = seg.y * cellSize;
+                    const isHead = i === 0;
+
+                    ctx.save();
+
+                    if (isHead) {
+                        // Head Glow & Styling
+                        ctx.shadowColor = '#00ff88';
+                        ctx.shadowBlur = 12;
+                        ctx.fillStyle = '#00ff88';
+
+                        const pad = 2;
+                        ctx.beginPath();
+                        ctx.roundRect(x + pad, y + pad, cellSize - pad * 2, cellSize - pad * 2, 6);
+                        ctx.fill();
+
+                        // Head Eyes
+                        ctx.fillStyle = '#050811';
+                        const eyeSize = 3;
+                        let eye1X = x + cellSize * 0.3;
+                        let eye1Y = y + cellSize * 0.3;
+                        let eye2X = x + cellSize * 0.7;
+                        let eye2Y = y + cellSize * 0.3;
+
+                        if (currentDir.x === 1) { // Right
+                            eye1X = x + cellSize * 0.7; eye1Y = y + cellSize * 0.3;
+                            eye2X = x + cellSize * 0.7; eye2Y = y + cellSize * 0.7;
+                        } else if (currentDir.x === -1) { // Left
+                            eye1X = x + cellSize * 0.3; eye1Y = y + cellSize * 0.3;
+                            eye2X = x + cellSize * 0.3; eye2Y = y + cellSize * 0.7;
+                        } else if (currentDir.y === 1) { // Down
+                            eye1X = x + cellSize * 0.3; eye1Y = y + cellSize * 0.7;
+                            eye2X = x + cellSize * 0.7; eye2Y = y + cellSize * 0.7;
+                        }
+
+                        ctx.beginPath();
+                        ctx.arc(eye1X, eye1Y, eyeSize, 0, Math.PI * 2);
+                        ctx.arc(eye2X, eye2Y, eyeSize, 0, Math.PI * 2);
+                        ctx.fill();
+
+                    } else {
+                        // Body Gradient / Opacity
+                        const alpha = 1 - (i / snake.length) * 0.5;
+                        ctx.fillStyle = `rgba(16, 185, 129, ${alpha})`;
+                        ctx.shadowColor = 'rgba(16, 185, 129, 0.4)';
+                        ctx.shadowBlur = 6;
+
+                        const pad = 3;
+                        ctx.beginPath();
+                        ctx.roundRect(x + pad, y + pad, cellSize - pad * 2, cellSize - pad * 2, 4);
+                        ctx.fill();
+                    }
+
+                    ctx.restore();
+                }
+
+                // Draw Particles
+                updateAndDrawParticles();
+            }
+
+            // Main Game Loop driven by requestAnimationFrame
+            function gameLoop(timestamp) {
+                if (!lastTime) lastTime = timestamp;
+                const deltaTime = timestamp - lastTime;
+                lastTime = timestamp;
+
+                if (state === 'PLAYING') {
+                    accumulator += deltaTime;
+                    while (accumulator >= currentTickRate) {
+                        tick();
+                        accumulator -= currentTickRate;
+                    }
+                }
+
+                render();
+                requestAnimationFrame(gameLoop);
+            }
+
+            // Input Handlers
+            function queueDirection(dx, dy) {
+                sounds.init();
+                if (state !== 'PLAYING') return;
+
+                const lastQueued = directionQueue.length > 0 
+                    ? directionQueue[directionQueue.length - 1] 
+                    : currentDir;
+
+                // Prevent 180-degree immediate reversal
+                if (dx !== -lastQueued.x || dy !== -lastQueued.y) {
+                    directionQueue.push({ x: dx, y: dy });
+                }
+            }
+
+            function handleKeyDown(e) {
+                sounds.init();
+
+                // Highlight key UI caps
+                const keyUpper = e.key.toUpperCase();
+                if (keyMapUI[keyUpper]) {
+                    keyMapUI[keyUpper].classList.add('pressed');
+                    setTimeout(() => keyMapUI[keyUpper].classList.remove('pressed'), 150);
+                }
+
+                switch (e.code) {
+                    case 'ArrowUp':
+                    case 'KeyW':
+                        e.preventDefault();
+                        queueDirection(0, -1);
+                        break;
+                    case 'ArrowDown':
+                    case 'KeyS':
+                        e.preventDefault();
+                        queueDirection(0, 1);
+                        break;
+                    case 'ArrowLeft':
+                    case 'KeyA':
+                        e.preventDefault();
+                        queueDirection(-1, 0);
+                        break;
+                    case 'ArrowRight':
+                    case 'KeyD':
+                        e.preventDefault();
+                        queueDirection(1, 0);
+                        break;
+                    case 'Space':
+                    case 'KeyP':
+                        e.preventDefault();
+                        togglePause();
+                        break;
+                    case 'KeyR':
+                        e.preventDefault();
+                        startGame();
+                        break;
+                    case 'KeyM':
+                        e.preventDefault();
+                        toggleSound();
+                        break;
+                }
+            }
+
+            window.addEventListener('keydown', handleKeyDown);
+
+            // Mobile Touch D-Pad handlers
+            document.getElementById('dpad-up').addEventListener('click', () => queueDirection(0, -1));
+            document.getElementById('dpad-down').addEventListener('click', () => queueDirection(0, 1));
+            document.getElementById('dpad-left').addEventListener('click', () => queueDirection(-1, 0));
+            document.getElementById('dpad-right').addEventListener('click', () => queueDirection(1, 0));
+
+            // Game Control Actions
+            function startGame() {
+                sounds.init();
+                sounds.playClickSound();
+                resetGame();
+                state = 'PLAYING';
+                overlayStart.classList.remove('active');
+                overlayPause.classList.remove('active');
+                overlayGameOver.classList.remove('active');
+            }
+
+            function togglePause() {
+                sounds.init();
+                sounds.playClickSound();
+                if (state === 'PLAYING') {
+                    state = 'PAUSED';
+                    overlayPause.classList.add('active');
+                } else if (state === 'PAUSED') {
+                    state = 'PLAYING';
+                    overlayPause.classList.remove('active');
+                }
+            }
+
+            function toggleSound() {
+                sounds.init();
+                sounds.muted = !sounds.muted;
+                btnSound.classList.toggle('active', !sounds.muted);
+            }
+
+            // UI Button Listeners
+            btnStartGame.addEventListener('click', startGame);
+            btnResumeGame.addEventListener('click', togglePause);
+            btnRestartGame.addEventListener('click', startGame);
+
+            btnPause.addEventListener('click', togglePause);
+            btnRestart.addEventListener('click', () => {
+                if (state !== 'MENU') startGame();
+            });
+            btnSound.addEventListener('click', toggleSound);
+
+            // Start initial animation loop
+            requestAnimationFrame(gameLoop);
+
+        })();
+    </script>
+</body>
+</html>

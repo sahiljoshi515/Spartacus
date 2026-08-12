@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Goa Roast Co. | Specialty Coffee from the Tropics</title>
+    <style>
+        :root {
+            --bg: #fdfbf7;
+            --text: #1c1917;
+            --accent: #c27a3f;
+            --accent-hover: #a85f2a;
+            --surface: #ffffff;
+            --surface-muted: #f5f2eb;
+            --border: #e7e2d8;
+            --shadow: 0 4px 20px rgba(28, 25, 23, 0.05);
+            --focus-ring: 0 0 0 3px rgba(194, 122, 63, 0.4);
+            --font: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            --radius: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        [data-theme="dark"] {
+            --bg: #121110;
+            --text: #f5f2eb;
+            --accent: #e2975d;
+            --accent-hover: #f0b382;
+            --surface: #1c1a19;
+            --surface-muted: #262422;
+            --border: #383431;
+            --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            --focus-ring: 0 0 0 3px rgba(226, 151, 93, 0.5);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: var(--font);
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            transition: var(--transition);
+        }
+
+        /* Focus States */
+        a:focus-visible, button:focus-visible, input:focus-visible, summary:focus-visible {
+            outline: none;
+            box-shadow: var(--focus-ring);
+        }
+
+        /* Sticky Navigation */
+        header {
+            position: sticky;
+            top: 0;
+            background-color: var(--surface);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+        .logo-container {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 700;
+            font-size: 1.25rem;
+        }
+        .nav-links {
+            display: none;
+            gap: 1.5rem;
+            list-style: none;
+        }
+        .nav-links a {
+            text-decoration: none;
+            color: var(--text);
+            font-weight: 500;
+            transition: var(--transition);
+        }
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        /* Buttons */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: var(--radius);
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .btn-primary {
+            background-color: var(--accent);
+            color: #ffffff;
+        }
+        .btn-primary:hover {
+            background-color: var(--accent-hover);
+        }
+        .btn-secondary {
+            background-color: transparent;
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+        .btn-secondary:hover {
+            background-color: var(--accent);
+            color: #ffffff;
+        }
+
+        /* Sections */
+        section {
+            padding: 4rem 1.5rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .section-title {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+        .section-title h2 {
+            font-size: 2.25rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .section-title p {
+            font-size: 1.1rem;
+            color: var(--text);
+            opacity: 0.8;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* Hero Section */
+        .hero-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        .hero-content h1 {
+            font-size: 3rem;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            color: var(--text);
+        }
+        .hero-content p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .hero-visual {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .hero-svg-container {
+            background: var(--surface-muted);
+            border-radius: 50%;
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+        }
+
+        /* Terroir Section */
+        .terroir-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+        .terroir-content h3 {
+            font-size: 1.75rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        .terroir-content p {
+            margin-bottom: 1.5rem;
+        }
+
+        /* Origins Section */
+        .origins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .origin-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+        .origin-card:hover {
+            transform: translateY(-5px);
+        }
+        .origin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+        .origin-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        .origin-price {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--accent);
+        }
+        .origin-meta {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            margin-bottom: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .origin-desc {
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Subscriptions Section */
+        .sub-toggle-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 3rem;
+        }
+        .toggle-label {
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: var(--border);
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px; width: 26px;
+            left: 4px; bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: var(--accent);
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .sub-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .sub-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem 2rem;
+            box-shadow: var(--shadow);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transition: var(--transition);
+        }
+        .sub-card.popular {
+            border-color: var(--accent);
+            transform: scale(1.03);
+        }
+        .popular-badge {
+            position: absolute;
+            top: -12px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: var(--accent);
+            color: #ffffff;
+            padding: 0.25rem 1rem;
+            font-size: 0.8rem;
+            font-weight: 700;
+            border-radius: 20px;
+            text-transform: uppercase;
+        }
+        .sub-title {
+            font-size: 1.75rem;
+            margin-bottom: 1rem;
+        }
+        .sub-price-container {
+            margin-bottom: 1.5rem;
+        }
+        .sub-price {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .sub-period {
+            font-size: 1rem;
+            opacity: 0.7;
+        }
+        .sub-features {
+            list-style: none;
+            margin-bottom: 2rem;
+            text-align: left;
+        }
+        .sub-features li {
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Brew Guides Section */
+        .brew-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+        .brew-tab-btn {
+            background: var(--surface-muted);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 0.75rem 1.5rem;
+            font-weight: 600;
+            border-radius: var(--radius);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .brew-tab-btn.active {
+            background-color: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+        }
+        .brew-panel {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2.5rem;
+            box-shadow: var(--shadow);
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+        @media (min-width: 768px) {
+            .brew-panel {
+                grid-template-columns: 1fr 1.2fr;
+            }
+        }
+        .brew-steps {
+            margin-top: 1.5rem;
+        }
+        .brew-step {
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+        }
+        .step-num {
+            background-color: var(--accent);
+            color: white;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+        }
+
+        /* Sustainability Section */
+        .sustain-container {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 3rem;
+            align-items: center;
+        }
+
+        /* Reviews Section */
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        .review-card {
+            background-color: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 2rem;
+            box-shadow: var(--shadow);
+        }
+        .review-stars {
+            color: var(--accent);
+            margin-bottom: 1rem;
+        }
+        .reviewer-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+        .reviewer-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--accent);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+        }
+
+        /* FAQ Section */
+        .faq-accordion {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .faq-item {
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 1rem;
+            background-color: var(--surface);
+            overflow: hidden;
+        }
+        .faq-trigger {
+            width: 100%;
+            text-align: left;
+            background: none;
+            border: none;
+            padding: 1.5rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .faq-trigger:hover {
+            background-color: var(--surface-muted);
+        }
+        .faq-icon {
+            transition: transform 0.3s ease;
+        }
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease, padding 0.3s ease;
+            padding: 0 1.5rem;
+        }
+        .faq-item.active .faq-content {
+            max-height: 200px;
+            padding: 0 1.5rem 1.5rem 1.5rem;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--surface);
+            border-top: 1px solid var(--border);
+            padding: 4rem 1.5rem 2rem 1.5rem;
+        }
+        .footer-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            max-width: 1200px;
+            margin: 0 auto 3rem auto;
+        }
+        .footer-col h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1.5rem;
+            color: var(--accent);
+        }
+        .footer-col ul {
+            list-style: none;
+        }
+        .footer-col ul li {
+            margin-bottom: 0.75rem;
+        }
+        .footer-col ul li a {
+            text-decoration: none;
+            color: var(--text);
+            opacity: 0.8;
+            transition: var(--transition);
+        }
+        .footer-col ul li a:hover {
+            color: var(--accent);
+            opacity: 1;
+        }
+        .footer-bottom {
+            text-align: center;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            font-size: 0.9rem;
+            opacity: 0.7;
+        }
+
+        /* Responsive Breakpoints */
+        @media (min-width: 576px) {
+            .nav-links {
+                display: flex;
+            }
+        }
+        @media (min-width: 768px) {
+            .hero-container {
+                grid-template-columns: 1.2fr 0.8fr;
+            }
+            .terroir-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            .sustain-container {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        @media (min-width: 1200px) {
+            section {
+                padding: 6rem 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="#" class="logo-container">
+            <svg width="32" height="32" viewBox="0 0 50 50" style="color: var(--accent);">
+                <path d="M25 5 L45 45 L5 45 Z" fill="none" stroke="currentColor" stroke-width="4"/>
+            </svg>
+            <span>Goa Roast Co.</span>
+        </a>
+        <ul class="nav-links">
+            <li><a href="#origins">Origins</a></li>
+            <li><a href="#subscriptions">Subscriptions</a></li>
+            <li><a href="#brew-guides">Brew Guides</a></li>
+            <li><a href="#sustainability">Sustainability</a></li>
+            <li><a href="#faq">FAQ</a></li>
+        </ul>
+        <div class="header-actions">
+            <button id="theme-toggle" class="btn btn-secondary" style="padding: 0.5rem 1rem;">Theme</button>
+        </div>
+    </header>
+
+    <main>
+        <!-- Section 1: Hero -->
+        <section class="hero">
+            <div class="hero-container">
+                <div class="hero-content">
+                    <h1>Sun-Drenched Beans, Roasted in Goa</h1>
+                    <p>We source the finest Arabica from the Western Ghats, bringing the soul of the tropics to your morning cup. Our journey begins in the lush, misty hills of Goa, where coffee cherries are hand-picked at peak ripeness. We believe in transparency, quality, and the art of the roast.</p>
+                    <div class="hero-buttons">
+                        <a href="#origins" class="btn btn-primary">Explore Origins</a>
+                        <a href="#subscriptions" class="btn btn-secondary">Subscribe Now</a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-svg-container">
+                        <!-- Hand-drawn SVG 1: Hero Product Artifact (Coffee Bag) -->
+                        <svg width="200" height="250" viewBox="0 0 100 100" style="color: var(--accent);">
+                            <path d="M30 20 L70 20 L75 85 L25 85 Z" fill="none" stroke="currentColor" stroke-width="3"/>
+                            <path d="M28 20 L72 20 L70 12 L30 12 Z" fill="none" stroke="currentColor" stroke-width="3"/>
+                            <path d="M30 16 L70 16" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <circle cx="50" cy="35" r="4" fill="currentColor"/>
+                            <path d="M35 48 L65 48 L65 78 L35 78 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                            <path d="M50 75 L50 60 Q45 55 40 58 M50 60 Q55 55 60 58 M50 63 Q42 60 44 65 M50 63 Q58 60 56 65" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                            <circle cx="50" cy="54" r="3" fill="currentColor"/>
+                            <path d="M38 72 Q41 70 44 72 T50 72 T56 72 T62 72" fill="none" stroke="currentColor" stroke-width="1.5"/>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Terroir & Heritage -->
+        <section id="terroir" style="background-color: var(--surface-muted);">
+            <div class="terroir-container">
+                <div class="terroir-visual">
+                    <!-- Hand-drawn SVG 2: Coffee Branch -->
+                    <svg width="200" height="200" viewBox="0 0 100 100" style="color: var(--accent);">
+                        <path d="M10 50 Q50 40 90 30" fill="none" stroke="currentColor" stroke-width="3"/>
+                        <path d="M30 45 Q40 25 55 35 Q45 50 30 45 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M60 37 Q70 15 85 25 Q75 42 60 37 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M40 43 Q30 65 15 55 Q25 38 40 43 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <circle cx="48" cy="49" r="5" fill="currentColor"/>
+                        <circle cx="55" cy="47" r="5" fill="currentColor"/>
+                        <circle cx="51" cy="54" r="5" fill="currentColor"/>
+                    </svg>
+                </div>
+                <div class="terroir-content">
+                    <h3>Roasting at Sea Level: The Goan Micro-Climate</h3>
+                    <p>Roasting coffee at sea level in Goa's humid, tropical climate presents a unique set of challenges and opportunities. The high ambient humidity slows down the initial moisture loss of the green beans, allowing for a longer, more even development phase inside our drum roaster. This results in an exceptionally smooth, low-acid cup with enhanced body and sweetness.</p>
+                    <p>Our state-of-the-art roastery in Panjim is climate-controlled to ensure consistency, but we embrace the natural coastal influence that gives our beans their signature tropical character. Every batch is meticulously monitored to capture the delicate balance of fruitiness and deep caramelization.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Our Origins -->
+        <section id="origins">
+            <div class="section-title">
+                <h2>Our Origins</h2>
+                <p>Explore our single-origin collection, each reflecting the unique terroir of the Western Ghats and roasted to perfection in Goa.</p>
+            </div>
+            <div class="origins-grid">
+                <div class="origin-card">
+                    <div>
+                        <div class="origin-header">
+                            <h3 class="origin-title">Anmod Ghat</h3>
+                            <span class="origin-price">₹780</span>
+                        </div>
+                        <div class="origin-meta">Altitude: 1,200m | Process: Washed</div>
+                        <p class="origin-desc">Grown in the misty heights of the Anmod Ghat, this exceptional Arabica features rich notes of dark chocolate, cinnamon, and a subtle hint of toasted coconut. It has a full body and a smooth, lingering finish.</p>
+                    </div>
+                    <button class="btn btn-secondary">Add to Cart</button>
+                </div>
+                <div class="origin-card">
+                    <div>
+                        <div class="origin-header">
+                            <h3 class="origin-title">Chorla Ghat</h3>
+                            <span class="origin-price">₹840</span>
+                        </div>
+                        <div class="origin-meta">Altitude: 1,350m | Process: Honey Sun-Dried</div>
+                        <p class="origin-desc">Sourced from the lush slopes of Chorla Ghat, this honey-processed coffee boasts a bright citrus acidity with notes of orange blossom, lemongrass, and a sweet wild honey finish. Perfect for a morning pour-over.</p>
+                    </div>
+                    <button class="btn btn-secondary">Add to Cart</button>
+                </div>
+                <div class="origin-card">
+                    <div>
+                        <div class="origin-header">
+                            <h3 class="origin-title">Netravali</h3>
+                            <span class="origin-price">₹890</span>
+                        </div>
+                        <div class="origin-meta">Altitude: 1,100m | Process: Natural</div>
+                        <p class="origin-desc">Hailing from the pristine forest reserve of Netravali, this natural-processed coffee is a fruit bomb. Expect intense aromas of ripe berries, dark cherry, and a creamy milk chocolate undertone.</p>
+                    </div>
+                    <button class="btn btn-secondary">Add to Cart</button>
+                </div>
+                <div class="origin-card">
+                    <div>
+                        <div class="origin-header">
+                            <h3 class="origin-title">Molelem</h3>
+                            <span class="origin-price">₹720</span>
+                        </div>
+                        <div class="origin-meta">Altitude: 1,150m | Process: Washed</div>
+                        <p class="origin-desc">A classic, balanced daily drinker from the foothills of Molem. It features a smooth, nutty profile with notes of roasted almond, brown sugar, and a clean, refreshing finish.</p>
+                    </div>
+                    <button class="btn btn-secondary">Add to Cart</button>
+                </div>
+                <div class="origin-card">
+                    <div>
+                        <div class="origin-header">
+                            <h3 class="origin-title">Kulem</h3>
+                            <span class="origin-price">₹810</span>
+                        </div>
+                        <div class="origin-meta">Altitude: 1,250m | Process: Monsooned</div>
+                        <p class="origin-desc">Exposed to the moisture-laden monsoon winds of Kulem, this coffee undergoes a unique transformation. It has extremely low acidity, a heavy body, and earthy notes of spice, leather, and woodsmoke.</p>
+                    </div>
+                    <button class="btn btn-secondary">Add to Cart</button>
+                </div>
+                <div class="origin-card">
+                    <div>
+                        <div class="origin-header">
+                            <h3 class="origin-title">Valpoi</h3>
+                            <span class="origin-price">₹860</span>
+                        </div>
+                        <div class="origin-meta">Altitude: 1,400m | Process: Peaberry</div>
+                        <p class="origin-desc">A rare selection of peaberry beans from the riverbeds of Valpoi. This coffee is highly aromatic, with delicate floral notes, jasmine, and a bright, crisp green apple acidity.</p>
+                    </div>
+                    <button class="btn btn-secondary">Add to Cart</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Subscriptions -->
+        <section id="subscriptions" style="background-color: var(--surface-muted);">
+            <div class="section-title">
+                <h2>Subscriptions</h2>
+                <p>Never run out of fresh coffee. Choose your frequency, enjoy exclusive savings, and get free shipping across India.</p>
+            </div>
+            <div class="sub-toggle-container">
+                <span class="toggle-label">Monthly</span>
+                <label class="switch">
+                    <input type="checkbox" id="billing-toggle">
+                    <span class="slider"></span>
+                </label>
+                <span class="toggle-label">Annual <span style="color: var(--accent); font-weight: 700;">(Save 20%)</span></span>
+            </div>
+            <div class="sub-grid">
+                <div class="sub-card">
+                    <div>
+                        <h3 class="sub-title">The Explorer</h3>
+                        <div class="sub-price-container">
+                            <span class="sub-price" id="price-explorer" data-m="950" data-a="760">₹950</span>
+                            <span class="sub-period">/ month</span>
+                        </div>
+                        <p style="margin-bottom: 1.5rem;">Perfect for casual coffee drinkers looking to discover new flavor profiles.</p>
+                        <ul class="sub-features">
+                            <li>✓ 1 x 250g bag per month</li>
+                            <li>✓ Rotating single-origins</li>
+                            <li>✓ Detailed tasting notes</li>
+                            <li>✓ Free shipping</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary">Subscribe Now</button>
+                </div>
+                <div class="sub-card popular">
+                    <div class="popular-badge">Most Popular</div>
+                    <div>
+                        <h3 class="sub-title">The Devotee</h3>
+                        <div class="sub-price-container">
+                            <span class="sub-price" id="price-devotee" data-m="1850" data-a="1480">₹1850</span>
+                            <span class="sub-period">/ month</span>
+                        </div>
+                        <p style="margin-bottom: 1.5rem;">Designed for daily brewers who appreciate consistency and depth.</p>
+                        <ul class="sub-features">
+                            <li>✓ 2 x 250g bags per month</li>
+                            <li>✓ Custom origin selection</li>
+                            <li>✓ Early access to micro-lots</li>
+                            <li>✓ Free shipping</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary">Subscribe Now</button>
+                </div>
+                <div class="sub-card">
+                    <div>
+                        <h3 class="sub-title">Roaster's Reserve</h3>
+                        <div class="sub-price-container">
+                            <span class="sub-price" id="price-reserve" data-m="2750" data-a="2200">₹2750</span>
+                            <span class="sub-period">/ month</span>
+                        </div>
+                        <p style="margin-bottom: 1.5rem;">For the ultimate coffee connoisseur seeking rare and limited editions.</p>
+                        <ul class="sub-features">
+                            <li>✓ 3 x 250g bags per month</li>
+                            <li>✓ Exclusive peaberries & nano-lots</li>
+                            <li>✓ Private virtual tasting session</li>
+                            <li>✓ Free shipping</li>
+                        </ul>
+                    </div>
+                    <button class="btn btn-primary">Subscribe Now</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 5: Brew Guides -->
+        <section id="brew-guides">
+            <div class="section-title">
+                <h2>Interactive Brew Guides</h2>
+                <p>Unlock the full potential of our beans with our step-by-step brewing instructions.</p>
+            </div>
+            <div class="brew-tabs">
+                <button class="brew-tab-btn active" onclick="showTab('v60', this)">V60 Pour Over</button>
+                <button class="brew-tab-btn" onclick="showTab('filter', this)">South Indian Filter</button>
+                <button class="brew-tab-btn" onclick="showTab('press', this)">French Press</button>
+            </div>
+            <div id="v60" class="brew-panel">
+                <div class="brew-visual" style="text-align: center;">
+                    <!-- Hand-drawn SVG 3: South Indian Brass Filter (Used as a placeholder brewer) -->
+                    <svg width="150" height="150" viewBox="0 0 100 100" style="color: var(--accent);">
+                        <path d="M35 15 L65 15 L63 45 L37 45 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M33 15 L67 15 L67 18 L33 18 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M37 45 L63 45 L65 75 L35 75 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M30 75 L70 75 L70 79 L30 79 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M48 10 L52 10 L52 15 L48 15 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M35 15 Q50 5 65 15 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M63 25 Q75 25 73 35 Q71 45 63 45" fill="none" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="brew-info">
+                    <h3>V60 Pour Over Guide</h3>
+                    <p>The V60 highlights the bright, floral, and complex tasting notes of our single-origin coffees. It produces a clean, light-bodied cup with zero sediment.</p>
+                    <div class="brew-steps">
+                        <div class="brew-step">
+                            <div class="step-num">1</div>
+                            <p>Grind 15g of coffee to a medium-fine consistency (resembling table salt).</p>
+                        </div>
+                        <div class="brew-step">
+                            <div class="step-num">2</div>
+                            <p>Rinse the paper filter with hot water to remove any paper taste and preheat the dripper.</p>
+                        </div>
+                        <div class="brew-step">
+                            <div class="step-num">3</div>
+                            <p>Add coffee, pour 40g of water at 93°C, and let it bloom for 30 seconds to release trapped gases.</p>
+                        </div>
+                        <div class="brew-step">
+                            <div class="step-num">4</div>
+                            <p>Pour the remaining water in circular motions up to 250g. Total brew time should be around 3 minutes.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="filter" class="brew-panel hidden">
+                <div class="brew-visual" style="text-align: center;">
+                    <!-- Reusing the Brass Filter SVG -->
+                    <svg width="150" height="150" viewBox="0 0 100 100" style="color: var(--accent);">
+                        <path d="M35 15 L65 15 L63 45 L37 45 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M33 15 L67 15 L67 18 L33 18 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M37 45 L63 45 L65 75 L35 75 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M30 75 L70 75 L70 79 L30 79 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M48 10 L52 10 L52 15 L48 15 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M35 15 Q50 5 65 15 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M63 25 Q75 25 73 35 Q71 45 63 45" fill="none" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="brew-info">
+                    <h3>South Indian Filter Guide</h3>
+                    <p>A traditional method that produces a thick, strong decoction, perfect for mixing with hot, frothed milk and sugar.</p>
+                    <div class="brew-steps">
+                        <div class="brew-step">
+                            <div class="step-num">1</div>
+                            <p>Add 20g of finely ground coffee (with 15-20% chicory) to the upper chamber of the brass filter.</p>
+                        </div>
+                        <div class="brew-step">
+                            <div class="step-num">2</div>
+                            <p>Gently press the coffee down with the plunger, leaving it inside the chamber.</p>
+                        </div>
+                        <div class="brew-step">
+                            <div class="step-num">3</div>
+                            <p>Pour boiling water over the plunger, fill the chamber, close the lid, and let it drip for 15 minutes.</p>
+                        </div>
+                        <div class="brew-step">
+                            <div class="step-num">4</div>
+                            <p>Mix the rich decoction with hot frothed milk and sugar, pouring it between cups to create a frothy head.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="press" class="brew-panel hidden">
+                <div class="brew-visual" style="text-align: center;">
+                    <!-- Reusing the Brass Filter SVG -->
+                    <svg width="150" height="150" viewBox="0 0 100 100" style="color: var(--accent);">
+                        <path d="M35 15 L65 15 L63 45 L37 45 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M33 15 L67 15 L67 18 L33 18 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M37 45 L63 45 L65 75 L35 75 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M30 75 L70 75 L70 79 L30 79 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M48 10 L52 10 L52 15 L48 15 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M35 15 Q50 5 65 15 Z" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M63 25 Q75 25 73 35 Q71 45 63 45" fill="none" stroke="currentColor" stroke-width="2"/>
+                    </svg>
+                </div>
+                <div class="brew-info">
+                    <h3>French Press Guide</h3>
+                    <p>An immersion brewing method that extracts the full body and rich oils of the coffee, resulting in a heavy, textured mouthfeel.</p>
+                    <div class="brew-steps">
+                        <div class="brew-step">
+                            <div class="step-num">1</div>
+                            <p>Grind 30g of coffee to a very coarse consistency (resembling sea salt).</p>
+                        </div>
+                        <div class="brew-step">
+                            <div class="step-num">2</div>
+                            <p>Add coffee to the press, pour 500ml of hot water (93°C), and stir gently to saturate all grounds.</p>
+                        </div>
+                        <div class="brew-step">
+                            <div class="step-num">3</div>
+                            <p>Place the lid on top without plunging, and let the coffee steep undisturbed for 4 minutes.</p>
+                        </div>
+                        <div class="brew-step">
+                            <div class="step-num">4</div>
+                            <p>Slowly press the plunger down, pour immediately to prevent over-extraction, and enjoy.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Sustainability & Impact -->
+        <section id="sustainability" style="background-color: var(--surface-muted);">
+            <div class="sustain-container">
+                <div class="sustain-content">
+                    <h2>Our Commitment to Sustainability</h2>
+                    <p>At Goa Roast Co., sustainability is at the core of everything we do. We believe that coffee production should be environmentally responsible and socially equitable. That's why we partner directly with farmers in the Western Ghats who use sustainable farming practices, such as shade-grown coffee and organic fertilizers. We are committed to reducing our environmental impact, from our roasting process to our packaging. We use energy-efficient roasters and are constantly looking for ways to minimize waste. We also believe in fair wages for our farmers and are committed to supporting the communities where our coffee is grown. We believe that when we support the people and the land, we can create a more sustainable future for everyone. Thank you for supporting our commitment to sustainability and for choosing coffee that makes a positive impact.</p>
+                </div>
+                <div class="sustain-visual" style="text-align: center;">
+                    <!-- Hand-drawn SVG 4: Coffee Roaster Drum -->
+                    <svg width="180" height="180" viewBox="0 0 100 100" style="color: var(--accent);">
+                        <circle cx="50" cy="45" r="30" fill="none" stroke="currentColor" stroke-width="3"/>
+                        <path d="M50 45 Q60 35 50 25 T40 45 T50 65 T60 45" fill="none" stroke="currentColor" stroke-width="2"/>
+                        <path d="M35 80 Q40 65 45 80 Z" fill="currentColor"/>
+                        <path d="M45 82 Q50 60 55 82 Z" fill="currentColor"/>
+                        <path d="M55 80 Q60 68 65 80 Z" fill="currentColor"/>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Customer Reviews -->
+        <section id="reviews">
+            <div class="section-title">
+                <h2>Customer Reviews</h2>
+                <p>Hear from our community of coffee lovers and home baristas across the country.</p>
+            </div>
+            <div class="reviews-grid">
+                <div class="review-card">
+                    <div class="review-stars">★★★★★</div>
+                    <p>"The Chorla Ghat honey-processed coffee is absolutely incredible. It has a bright, clean taste that is perfect for my morning pour-over. I love knowing that the beans are sourced sustainably and roasted right here in Goa."</p>
+                    <div class="reviewer-info">
+                        <div class="reviewer-avatar">AR</div>
+                        <div>
+                            <h4 style="font-size: 1rem;">Ananya Rao</h4>
+                            <p style="font-size: 0.85rem; opacity: 0.7;">Home Barista, Mumbai</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-stars">★★★★★</div>
+                    <p>"I've been subscribing to the Devotee plan for six months now, and I couldn't be happier. The coffee is always incredibly fresh, and the rotating origins keep things exciting. Highly recommend to anyone who loves great coffee."</p>
+                    <div class="reviewer-info">
+                        <div class="reviewer-avatar">DF</div>
+                        <div>
+                            <h4 style="font-size: 1rem;">Daniel Fernandes</h4>
+                            <p style="font-size: 0.85rem; opacity: 0.7;">Cafe Owner, Panjim</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-card">
+                    <div class="review-stars">★★★★★</div>
+                    <p>"The Kulem Monsoon Gold is a revelation. The low acidity and heavy body make it perfect for my French press. It has this amazing earthy, spicy flavor that I haven't found anywhere else. Truly exceptional coffee."</p>
+                    <div class="reviewer-info">
+                        <div class="reviewer-avatar">SM</div>
+                        <div>
+                            <h4 style="font-size: 1rem;">Siddharth Mehta</h4>
+                            <p style="font-size: 0.85rem; opacity: 0.7;">Coffee Enthusiast, Delhi</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 8: FAQ Accordion -->
+        <section id="faq">
+            <div class="section-title">
+                <h2>Frequently Asked Questions</h2>
+                <p>Got questions? We've got answers. If you can't find what you're looking for, feel free to reach out to us.</p>
+            </div>
+            <div class="faq-accordion">
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">
+                        <span>How does the Goan coastal climate affect the roasting process?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <p>Our coastal location in Goa offers a unique roasting environment. The higher ambient humidity slows down the initial moisture loss of the green beans, allowing for a longer, more even development phase inside the roaster. This results in an exceptionally smooth, low-acid cup with enhanced body and sweetness.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">
+                        <span>What is the difference between single-origin and blends?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <p>Single-origin coffees are sourced from a single farm, estate, or region, highlighting the unique terroir and flavor characteristics of that specific place. Blends, on the other hand, combine beans from different origins to create a consistent, balanced flavor profile that is perfect for espresso or daily drinking.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">
+                        <span>How fresh is the coffee when it arrives at my doorstep?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <p>We roast in small batches daily and ship all orders within 24 hours of roasting. This ensures that your coffee arrives at peak freshness, allowing you to enjoy the full range of aromas and flavors that our specialty beans have to offer.</p>
+                    </div>
+                </div>
+                <div class="faq-item">
+                    <button class="faq-trigger" onclick="toggleFaq(this)">
+                        <span>Can I pause, modify, or cancel my subscription at any time?</span>
+                        <span class="faq-icon">▼</span>
+                    </button>
+                    <div class="faq-content">
+                        <p>Yes, absolutely! You have full control over your subscription through your account dashboard. You can easily pause, modify your delivery frequency, change your coffee selection, or cancel your subscription at any time with no hidden fees or penalties.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Section 9: Footer -->
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4 style="font-weight: 700; font-size: 1.2rem; color: var(--text); margin-bottom: 1rem;">Goa Roast Co.</h4>
+                <p style="opacity: 0.8; font-size: 0.95rem;">Bringing the finest specialty coffee from the Western Ghats to your cup, roasted with love in tropical Goa.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#origins">Our Origins</a></li>
+                    <li><a href="#subscriptions">Subscriptions</a></li>
+                    <li><a href="#brew-guides">Brew Guides</a></li>
+                    <li><a href="#sustainability">Sustainability</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Contact Us</h4>
+                <p style="opacity: 0.8; font-size: 0.95rem; margin-bottom: 0.5rem;">Email: hello@goaroast.co</p>
+                <p style="opacity: 0.8; font-size: 0.95rem; margin-bottom: 0.5rem;">Phone: +91 98765 43210</p>
+                <p style="opacity: 0.8; font-size: 0.95rem;">Address: Fontainhas, Panjim, Goa, India</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Goa Roast Co. All rights reserved. Crafted with passion in Goa.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Theme Toggle with LocalStorage Persistence
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'light');
+        }
+
+        themeToggleBtn.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // Subscription Billing Toggle
+        const billingToggle = document.getElementById('billing-toggle');
+        const priceExplorer = document.getElementById('price-explorer');
+        const priceDevotee = document.getElementById('price-devotee');
+        const priceReserve = document.getElementById('price-reserve');
+
+        billingToggle.addEventListener('change', () => {
+            const isAnnual = billingToggle.checked;
+            if (isAnnual) {
+                priceExplorer.textContent = `₹${priceExplorer.dataset.a}`;
+                priceDevotee.textContent = `₹${priceDevotee.dataset.a}`;
+                priceReserve.textContent = `₹${priceReserve.dataset.a}`;
+            } else {
+                priceExplorer.textContent = `₹${priceExplorer.dataset.m}`;
+                priceDevotee.textContent = `₹${priceDevotee.dataset.m}`;
+                priceReserve.textContent = `₹${priceReserve.dataset.m}`;
+            }
+        });
+
+        // Brew Guides Tab Switcher
+        function showTab(tabId, btnElement) {
+            const panels = document.querySelectorAll('.brew-panel');
+            const buttons = document.querySelectorAll('.brew-tab-btn');
+
+            panels.forEach(panel => panel.classList.add('hidden'));
+            buttons.forEach(btn => btn.classList.remove('active'));
+
+            document.getElementById(tabId).classList.remove('hidden');
+            btnElement.classList.add('active');
+        }
+
+        // FAQ Accordion Toggle
+        function toggleFaq(button) {
+            const faqItem = button.parentElement;
+            const isActive = faqItem.classList.contains('active');
+
+            // Close all FAQ items
+            document.querySelectorAll('.faq-item').forEach(item => {
+                item.classList.remove('active');
+                item.querySelector('.faq-content').style.maxHeight = null;
+            });
+
+            if (!isActive) {
+                faqItem.classList.add('active');
+                const content = faqItem.querySelector('.faq-content');
+                content.style.maxHeight = content.scrollHeight + "px";
+            }
+        }
+    </script>
+</body>
+</html>
