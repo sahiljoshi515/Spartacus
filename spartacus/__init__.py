@@ -12,13 +12,17 @@ The package is deliberately readable end to end. In dependency order:
     session.py    the transcript on disk, and repair when it is torn
     subagent.py   delegation as a tool
     harness.py    the one object that wires all of the above together
+    fleet.py      many harnesses at once, one directory each
+    cli.py        the front door: headless and interactive
 
-Four names are exported, because four is what a caller needs: the harness to
-run, the policy to constrain it, and the pair used to write a tool of your own.
+Five names are exported, because five is what a caller needs: the harness to
+run, the policy to constrain it, the pair used to write a tool of your own, and
+the fleet runner for when one agent is not enough.
 """
 
+from .fleet import run_fleet
 from .harness import Harness
 from .security import Policy
 from .tools import Tool, tool
 
-__all__ = ["Harness", "Policy", "Tool", "tool"]
+__all__ = ["Harness", "Policy", "Tool", "run_fleet", "tool"]
